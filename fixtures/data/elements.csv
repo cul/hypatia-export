@@ -1,0 +1,85 @@
+id,category,name,code
+325,Template,AC: Type: Published Article 2010,acPubArticle10
+326,Field,Title,tiInfoTitle
+327,Field,Subtitle,tiInfoSubTitle
+328,Template,"AC: Template: Name, Extended Affiliation",nameAffil
+329,Field,Name: Given,namePartGiven
+330,Field,Name: Family,namePartFamily
+331,Field,Role,nameRoleTerm
+332,Template,AC: Template: Affiliation-Extended,affilAffiliation
+333,Field,Email Address,affilEmail
+334,Field,Institute / Center,affilDeptOther
+335,Field,Columbia Department,affilDept
+336,Field,Organization,affilOrganization
+337,Field,Country,originCountry
+338,Field,UNI,affilAuIDUNI
+339,Field,Author / Creator ID,affilAuIDLocal
+340,Field,Name Authority Number,affilAuIDNAF
+341,Field,Type of Resource,typeResc
+342,Field,Genre,genreGenre
+343,Field,Date Issued,originDateIssued
+344,Field,Language Term: Text,langLanguageTermText
+345,Field,Internet Media Type,physDsInternetMediaType
+346,Field,Number of Pages,physDsExtentPages
+347,Field,File Size,physDsExtentFileSize
+348,Field,AC: UR MODS Abstract (8),abstract
+349,Field,Note,noteField
+350,Field,Topic,subjectTopicKeyword
+351,Field,Keyword,subjectTopicKeyword
+352,Field,Geographic Area,subjectGeoCode
+353,Template,AC: Template: Pub Article Related Item Host,relatedArticleHost
+354,Field,Title,tiInfoTitle
+355,Field,Volume,partVolume
+356,Field,Issue,partIssue
+357,Field,Page: Begin,partExtentStart
+358,Field,Page: End,partExtentEnd
+359,Field,Date,partDateYear
+360,Field,Identifier: ISSN,iDIdentifierISSN
+361,Template,AC: UR MODS Identifier (15),identifier
+362,Field,Identifier: Local Object ID,iDIdentifierLocal
+363,Field,Identifier: DOI,IDidentifierDOI
+364,Field,Identifier: URI,IDidentifierURI
+365,Field,Identifier: Handle,iDIdentifierHandle
+366,Field,URL,locURL
+367,Template,AC: Template: Copyright,copyright
+368,Field,Copyright Status,copyCopyStatus
+369,Field,Publication Status,copyPubStatus
+370,Field,Copyright Year,copyYear
+371,Field,Copyright Country,copyCountry
+372,Field,Name of Rights Holder,copyRightsName
+373,Field,Rights Holder Contact Info,copyRightsContact
+374,Field,Rights Holder Note,copyRightsNote
+375,Field,Copyright License,accCCStatements
+376,Field,General Statements about Copyright or Ownership,copyCopyStatement
+377,Template,AC: Template: Embargo,copyEmbargo
+378,Field,Level of Access,copyEmAccessLevel
+379,Field,Resource Visible,EmRsrcVsbl
+380,Field,Embargo Issued By,copyEmIssuedBy
+381,Field,Date Embargo Begins,copyEmDateBegin
+382,Field,Date Embargo Ends,copyEmDateEnd
+383,Field,Note on Embargo,copyEmNote
+384,Field,Peer Review Status,EmPeerReview
+385,Field,Author Rights,extAuthorRightsStatement
+386,Field,Record Origin,recInfRecordOrigin
+387,Field,Attachments,Attachments
+388,Field,Columbia Topic,subjectTopicCU
+1087,Field,UNI,affilAuIDUNI
+1089,Field,Identifier: HDL,identifierHDL
+1321,Field,Columbia Department,affilDept
+1322,Template,"AC: UR MODS Name, Corporate (2b)",nameTypeCorporate
+1323,Field,Name: General,namePart
+1324,Field,Role,nameRoleTerm
+1326,Field,Identifier: ISSN,iDIdentifierISSN
+1332,Field,Edition,originInfoEdition
+1334,Field,Identifier: DOI,identifierDOI
+2,Field,Title,tiInfoTitle
+50,Field,Note,noteField
+57,Field,URL,locURL
+173,Field,Name: Date,namePartDate
+188,Field,Identifier: DOI,IDidentifierDOI
+591,Template,AC: Template: Related Item References,relatedItemReferences
+1090,Template,AC: UR MODS Identifier (15),identifier
+1091,Field,Identifier: DOI,identifierDOI
+1092,Field,Identifier: Type,identifierType
+1088,Field,Identifier: Type,identifierType
+1325,Field,Identifier: DOI,identifierDOI

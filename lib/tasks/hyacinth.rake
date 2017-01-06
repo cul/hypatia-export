@@ -5,7 +5,7 @@ namespace :hyacinth do
     # parse the element paths & populate the id-to-code hash
     elements_to_codes = {}
     elements_hierarchy = Hash.new {|hash,key| hash[key] = Hash.new &hash.default_proc }
-    open("test/data/elements.csv") do |blob|
+    open("fixtures/data/elements.csv") do |blob|
       blob.each do |line|
         line.strip!
         values = line.parse_csv
@@ -29,7 +29,7 @@ namespace :hyacinth do
     # item = Item.find(4066)
     header_line = "id,item_id,element_id,parent_id,data,created_at,updated_at"
     headers = header_line.split(',').collect { |hdr| hdr.to_sym }
-    open('test/data/values.csv','w') do |out|
+    open('tmp/data/values.csv','w') do |out|
       out.print(header_line)
       Item.where(:conditions => ["id IN (?)" , [2240,3063,3064]], :limit => 3).each do |item|
         value_ids_by_element = Hash.new {|h,k| h[k] = []}
@@ -67,7 +67,7 @@ namespace :hyacinth do
   task :export_values => :export do
     # parse the element paths & populate the id-to-code hash
     elements_to_codes = {}
-    open("test/data/elements.csv") do |blob|
+    open("fixtures/data/elements.csv") do |blob|
       blob.each do |line|
         line.strip!
         values = CSV.parse_line(line)
@@ -78,9 +78,9 @@ namespace :hyacinth do
     end
 
     items = {'2240' => 'ac:128939', '3063' => 'ac:130062', '3064' => 'ac:130066'}
-    elements = CSV.read('test/data/elements.csv')
+    elements = CSV.read('fixtures/data/elements.csv')
     # values for 3 items, cached
-    values = CSV.read('test/data/values.csv')
+    values = CSV.read('fixtures/data/values.csv')
 
     module Values
       class << self; attr_accessor :id, :item_id, :element_id, :parent_id, :data; end

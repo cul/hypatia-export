@@ -4,12 +4,14 @@ require 'hyacinth_export/values'
 module HyacinthExport
   def self.export; end
 
+  # Exporting with cached values. Does not require a db connection.
+  # Exporting to a CSV.
   def self.export_values
     elements_to_codes = elements_to_codes
 
     items = {'2240' => 'ac:128939', '3063' => 'ac:130062', '3064' => 'ac:130066'}
     # values for 3 items, cached
-    values = CSV.read('fixtures/data/values.csv') 
+    values = CSV.read('fixtures/data/values.csv')
 
     elements_to_codes = HyacinthExport.elements_to_codes
 
@@ -22,10 +24,12 @@ module HyacinthExport
     end
     headers.uniq!
     headers.sort!
-    puts CSV.generate_line(headers)
-    value_maps.each do |value_map|
-      row_values = headers.collect { |tag| value_map[tag] }
-      puts CSV.generate_line(row_values)
+    CSV.open('tmp/data/test-export-values.csv','w') do |csv|
+      csv.add_row(headers)
+      value_maps.each do |value_map|
+        row_values = headers.collect { |tag| value_map[tag] }
+        csv.add_row(row_values)
+      end
     end
   end
 

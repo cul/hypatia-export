@@ -7,9 +7,7 @@
 # space (belongs): mandatory, represents the current space it belongs to
 # values (many):: represents all of the metadata and files blobs.
 #
-class Item < ActiveRecord::Base
-  extend ActiveSupport::Memoizable
-  
+class Item < ActiveRecord::Base  
   has_many :values, :dependent => :destroy
 
   validates_presence_of :item_type

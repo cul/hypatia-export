@@ -1,6 +1,4 @@
 class Element < ActiveRecord::Base
-  extend ActiveSupport::Memoizable
-
   CATEGORY_TYPES = %w{Field Template}
   FIELD_TYPES = %w{text textarea date datetime checkbox select userpicker file handle ezid}
   VALID_CODE = /^[A-Za-z_:][A-Za-z0-9\.-_:]+$/

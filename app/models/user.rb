@@ -1,7 +1,4 @@
 class User < ActiveRecord::Base
-  
-  extend ActiveSupport::Memoizable
-  
   has_many :groups, :through => :memberships
   has_many :memberships, :dependent => :destroy
 

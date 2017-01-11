@@ -257,6 +257,18 @@ class Item < ActiveRecord::Base
     self
   end
 
+  def fedora_pid
+    unless defined? @fedora_pid
+      fedora_export = exports.detect do |export|
+        export.options.where(entity_type: 'Export', value: 'Aggregator').first
+      end
+      option = fedora_export ?
+        fedora_export.options.where(entity_type: 'Export', value: 'Aggregator').first : nil
+      @fedora_pid = option ? option.name : nil
+    end
+    @fedora_pid
+  end
+
   protected
 
   def add_in_values_by_query(loc, values, expression, replace)

@@ -1,6 +1,8 @@
 class VerificationTest < ActiveRecord::Base
-  
   VALID_CATEGORIES = %w{presence value count format numericality uniqueness}
+
+  include Optionable
+
   validates_inclusion_of :category, :in => VALID_CATEGORIES
   
   belongs_to :set, :class_name => "VerificationSet", :foreign_key => :set_id

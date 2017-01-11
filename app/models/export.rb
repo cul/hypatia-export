@@ -1,4 +1,6 @@
 class Export < ActiveRecord::Base
+  include Optionable
+
   belongs_to :external_store
   belongs_to :item
   belongs_to :mapping

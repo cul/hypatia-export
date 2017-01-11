@@ -3,7 +3,9 @@ class Element < ActiveRecord::Base
   FIELD_TYPES = %w{text textarea date datetime checkbox select userpicker file handle ezid}
   VALID_CODE = /^[A-Za-z_:][A-Za-z0-9\.-_:]+$/
   INVALID_CODE_MSG = "must start with a letter or _, and include only letters, digits, periods, underscores, and dashes."
-  
+
+  include Optionable
+
   has_many :children, :through => :children_links, :order => "position"
   has_many :children_links, :class_name => "ElementLink", :foreign_key => :parent_id, :dependent => :destroy, :order => "position"
   

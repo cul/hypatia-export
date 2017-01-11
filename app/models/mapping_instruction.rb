@@ -1,7 +1,8 @@
 class MappingInstruction < ActiveRecord::Base
-  
   CATEGORY_TYPES = %w{build_temp_dir clean_temp_dir eval_template}
-  
+
+  include Optionable
+
   validates_presence_of :mapping
   belongs_to :mapping
   

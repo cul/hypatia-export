@@ -31,6 +31,17 @@ namespace :hyacinth do
   end
 
   task :export_values => :environment do
-    HyacinthExport.export_values
+    if ENV['items']
+      item_ids = ENV['items'].split(',').map(&:to_i)
+      puts "item_ids: #{item_ids.inspect}"
+      items = Item.find(*item_ids)
+    elsif ENV['item_type']
+      limit = ENV['limit'] ? ENV['limit'].to_i : 10
+      items = Item.where(item_type_id: ENV['item_type'].to_i).limit(limit)
+    else
+      puts "pass items=ID,ID,ID... or item_type=ID [limit=LIMIT]"
+    end
+
+    HyacinthExport.export_values(items) if items
   end
 end

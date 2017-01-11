@@ -48,19 +48,20 @@ module HyacinthExport
   end
 
   # Exporting with cached values. Does not require a db connection.
-  def self.export_values #export_records
+  def self.export_values(items)
     elements_to_codes = elements_to_codes
 
-    items = {'2240' => 'ac:128939', '3063' => 'ac:130062', '3064' => 'ac:130066'}
+    #items = {'2240' => 'ac:128939', '3063' => 'ac:130062', '3064' => 'ac:130066'}
     # values for 3 items, cached
-    values = CSV.read('fixtures/data/values.csv')
+    # values = CSV.read('fixtures/data/values.csv')
 
     elements_to_codes = HyacinthExport.elements_to_codes
 
     headers = []
-    value_maps = items.collect do |item_id, pid|
-      item_values = values.select { |value| value[Values.item_id] == item_id }
-      value_map = Values.accumulate(nil,nil,elements_to_codes,item_values,{ '_pid' => pid })
+    value_maps = items.collect do |item|
+      item_id = item.id
+      pid = item.fedora_pid
+      value_map = Values.accumulate(nil,nil,elements_to_codes,item.values,{ '_pid' => pid })
       headers += value_map.keys.sort
       value_map
     end

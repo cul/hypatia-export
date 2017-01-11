@@ -5,9 +5,8 @@ class SwitchToStateWorkflow < ActiveRecord::Migration
     change_table (:items) do |t|
       t.string :status, :limit => 50
     end
-    Item.find(:all).each { |i| i.update_attributes(:status => i.status.gsub(/ /,"").underscore) }
-    
-    
+    Item.all.each { |i| i.update_attributes(:status => i.status.gsub(/ /,"").underscore) }
+
     add_index :items, [:space_id, :status]
 
     drop_table :workflow_transitions

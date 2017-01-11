@@ -14,7 +14,7 @@ class Item < ActiveRecord::Base
   belongs_to :item_type
   belongs_to :space
   
-  has_many :logs, :as => :loggable, :order => "created_at DESC"
+  has_many :logs, -> { order("created_at DESC")}, :as => :loggable
   has_many :exports
   has_many :sword_deposits
 
@@ -71,14 +71,15 @@ class Item < ActiveRecord::Base
   @@per_page = 10
     
   def owners
+    return @owners if defined? @owners
     role = Role.find_by_context_type_and_context_id_and_name("Item", self.id, "Owner")
-    role ? role.assignments.collect(&:users).flatten.uniq : []
+    @owners = role ? role.assignments.collect(&:users).flatten.uniq : []
   end
 
 
   def can_edit?(user)
-    check_permissions(user).check_action(workflow, "Edit_#{status}", "Edit_All")
-  
+    return @editable if defined? @editable
+    @editable = check_permissions(user).check_action(workflow, "Edit_#{status}", "Edit_All")
   end
 
   def can_export?(user)
@@ -116,7 +117,8 @@ class Item < ActiveRecord::Base
   
   
   def check_permissions(user = nil)
-    Permission.check(:user => user, :contexts => [self, ObjectTag["Space", self.space_id]], :key => :permissible)
+    return @permissible if defined? @permissible
+    @permissible = Permission.check(:user => user, :contexts => [self, ObjectTag["Space", self.space_id]], :key => :permissible)
   end
   
   def audits?
@@ -254,10 +256,9 @@ class Item < ActiveRecord::Base
     
     self
   end
-  
-  
+
   protected
-  
+
   def add_in_values_by_query(loc, values, expression, replace)
     case values
     when Hash
@@ -275,7 +276,7 @@ class Item < ActiveRecord::Base
       Value.create(:element => loc.element, :parent => loc.parent, :item => self, :data => values)
     end
   end
-  
+
   def query_and_modify_values!(method, args)
     options = args.extract_options!
     
@@ -287,9 +288,4 @@ class Item < ActiveRecord::Base
     
     return self
   end
-  
-  
-  memoize :can_edit?
-  memoize :owners  
-  memoize :check_permissions
 end

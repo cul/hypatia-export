@@ -1,16 +1,16 @@
 class Element < ActiveRecord::Base
   CATEGORY_TYPES = %w{Field Template}
   FIELD_TYPES = %w{text textarea date datetime checkbox select userpicker file handle ezid}
-  VALID_CODE = /^[A-Za-z_:][A-Za-z0-9\.-_:]+$/
+  VALID_CODE = /\A[A-Za-z_:][A-Za-z0-9\.-_:]+\Z/
   INVALID_CODE_MSG = "must start with a letter or _, and include only letters, digits, periods, underscores, and dashes."
 
   include Optionable
 
-  has_many :children, :through => :children_links, :order => "position"
-  has_many :children_links, :class_name => "ElementLink", :foreign_key => :parent_id, :dependent => :destroy, :order => "position"
+  has_many :children, -> { order("position")}, :through => :children_links
+  has_many :children_links, -> { order("position")}, :class_name => "ElementLink", :foreign_key => :parent_id, :dependent => :destroy
   
-  has_many :parents, :through => :parent_links, :order => "position"
-  has_many :parent_links, :class_name => "ElementLink", :foreign_key => :child_id, :dependent => :destroy, :order => "position"
+  has_many :parents, -> { order("position")}, :through => :parent_links
+  has_many :parent_links, -> { order("position")}, :class_name => "ElementLink", :foreign_key => :child_id, :dependent => :destroy
 
   has_options
   accepts_nested_attributes_for :options, :allow_destroy => true, :reject_if => proc { |attrs| attrs.all? {|k,v| v.blank? }}
@@ -187,11 +187,11 @@ class Element < ActiveRecord::Base
   
 
  def self.find_children_ids_of(all_ids, *element_ids)
-    child_ids = ElementLink.find_all_by_parent_id(element_ids).collect(&:child_id).uniq
+    child_ids = ElementLink.where(parent_id: element_ids).collect(&:child_id).uniq
     new_to_test = child_ids - all_ids
-     
+
     all_ids = Element.find_children_ids_of(all_ids | child_ids, *new_to_test) unless new_to_test.empty?
-     
+
     all_ids
   end
   

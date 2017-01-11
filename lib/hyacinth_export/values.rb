@@ -30,10 +30,21 @@ module Values
      next unless value.parent_id == parent_id
      children_by_element[value.element_id] << value
    end
-   children_by_element.each do |element, element_values|
-     code = elements_to_codes[element.to_s]
+   children_by_element.each do |element_id, element_values|
+     # load missing elements if possible
+     unless elements_to_codes.has_key? element_id.to_s
+      element = Element.find(element_id.to_i)
+
+      elements_to_codes[element.id.to_s] = element.code
+      elements = Element.find(*element.nested_children_ids)
+      elements = [elements] unless elements.respond_to? :each
+      elements.each do |element|
+        elements_to_codes[element.id.to_s] = element.code
+      end
+     end
+     code = elements_to_codes[element_id.to_s]
      if code.nil?
-       puts "no code for #{element}"
+       puts "no code for #{element_id}"
        next
      end
      tag = prefix.nil? ? code : "#{prefix}:#{code}"

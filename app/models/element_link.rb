@@ -4,8 +4,8 @@ class ElementLink < ActiveRecord::Base
   belongs_to :parent, :class_name => "Element", :foreign_key => :parent_id
   belongs_to :child, :class_name => "Element", :foreign_key => :child_id
   
-  before_validation_on_create :assign_first_free_position
-  
+  before_validation(:assign_first_free_position, on: :create) 
+
   validates_uniqueness_of :child_id, :scope => :parent_id
   validates_uniqueness_of :position, :scope => :parent_id
 

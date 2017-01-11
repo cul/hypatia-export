@@ -80,7 +80,7 @@ class User < ActiveRecord::Base
   
   
   def name
-    [first_name, last_name].join(" ")
+    @name ||= [first_name, last_name].join(" ")
   end
 
   def to_s
@@ -94,6 +94,7 @@ class User < ActiveRecord::Base
   
   # this could be more efficient (or just make it a binary tree)
   def role_map
+    return @role_map if defined? @role_map
     base_conditions = '((assignments.subject_type = "User" AND assignments.subject_id = ?) OR (assignments.subject_type = "Group" AND assignments.subject_id IN (?)))' 
     base_parameters = [self.id, groups.collect(&:id)]
   
@@ -115,17 +116,13 @@ class User < ActiveRecord::Base
         to_find << child unless link_hash.has_key?(child)
       end
     end
-  
-    return RoleMap.new(Role.find_all_by_id(all_roles), link_hash)
+
+    @role_map = RoleMap.new(Role.find_all_by_id(all_roles), link_hash)
   end
 
   
   def has_role?(options = {})
     self.role_map.has_role?(options)
   end
-
-  memoize :role_map
-  memoize :has_role?
-  memoize :name
 end
 

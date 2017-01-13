@@ -1,5 +1,6 @@
 require 'csv'
 require 'hyacinth_export'
+require 'hyacinth_export/map_headers'
 
 namespace :hyacinth do
   desc "export data for hyacinth"
@@ -43,5 +44,9 @@ namespace :hyacinth do
     end
 
     HyacinthExport.export_values(items) if items
+  end
+
+  task :export_from_acpubarticle10 => :environment do
+    HyacinthExport::MapHeaders.from_acpubarticle10
   end
 end

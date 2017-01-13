@@ -24,7 +24,7 @@ module HyacinthExport
           csv.add_row(fields)
         end
 
-        # Gets the relationships between the different values attached to this item.
+        # Gets the relationships between the different values attached to this item???
         #
         # values_hierarchy = Hash.new {|hash,key| hash[key] = Hash.new &hash.default_proc }
         # current = values_hierarchy[root.id]

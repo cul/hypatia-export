@@ -8,7 +8,7 @@ module HyacinthExport
     header_line = "id,item_id,element_id,parent_id,data,created_at,updated_at"
     headers = header_line.split(',').collect { |hdr| hdr.to_sym }
 
-    CSV.open('tmp/data/values.csv','w') do |csv|
+    ::CSV.open('tmp/data/values.csv','w') do |csv|
       csv.add_row(header_line.split(","))
       Item.where("id IN (?)", [2240,3063,3064]).limit(3).each do |item|
         value_ids_by_element = Hash.new {|h,k| h[k] = []}
@@ -51,7 +51,7 @@ module HyacinthExport
   def self.export_values(items)
     elements_to_codes = elements_to_codes
 
-    #items = {'2240' => 'ac:128939', '3063' => 'ac:130062', '3064' => 'ac:130066'}
+    # items = {'2240' => 'ac:128939', '3063' => 'ac:130062', '3064' => 'ac:130066'}
     # values for 3 items, cached
     # values = CSV.read('fixtures/data/values.csv')
 
@@ -67,7 +67,7 @@ module HyacinthExport
     end
     headers.uniq!
     headers.sort!
-    CSV.open('tmp/data/test-export-values.csv','w') do |csv|
+    ::CSV.open("tmp/data/test-export-values.csv",'w') do |csv|
       csv.add_row(headers)
       value_maps.each do |value_map|
         row_values = headers.collect { |tag| value_map[tag] }
@@ -84,7 +84,7 @@ module HyacinthExport
     open("fixtures/data/elements.csv") do |blob|
      blob.each do |line|
        line.strip!
-       values = CSV.parse_line(line)
+       values = ::CSV.parse_line(line)
        code = values[3]
        id = values[0]
        elements_to_codes[id] = code

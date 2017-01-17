@@ -45,10 +45,10 @@ module HyacinthExport
       'english' => 'http://id.loc.gov/vocabulary/iso639-2/eng',
       'arabic' => 'http://id.loc.gov/vocabulary/iso639-2/ara',
       'chinese' => 'http://id.loc.gov/vocabulary/iso639-2/chi',
-      'dutch' => '',
-      'french' => '',
-      'german' => '',
-      'greek' => '',
+      'dutch' => 'http://id.loc.gov/vocabulary/iso639-2/dut',
+      'french' => 'http://id.loc.gov/vocabulary/iso639-2/fre',
+      'german' => 'http://id.loc.gov/vocabulary/iso639-2/ger',
+      'greek' => 'http://id.loc.gov/vocabulary/iso639-2/gre',
       'hebrew' => 'http://id.loc.gov/vocabulary/iso639-2/heb',
       'italian' => 'http://id.loc.gov/vocabulary/iso639-2/ita',
       'japanese' => 'http://id.loc.gov/vocabulary/iso639-2/jpn',
@@ -71,17 +71,23 @@ module HyacinthExport
       'speaker' => 'http://id.loc.gov/vocabulary/relators/spk',
       'thesis advisor' => 'http://id.loc.gov/vocabulary/relators/ths',
       'translator' => 'http://id.loc.gov/vocabulary/relators/trl',
+      'originator' => 'http://id.loc.gov/vocabulary/relators/org',
     }
 
 
     def value_to_uri(value_column, uri_column_name, map)
       # update the values in the value column to uris
       i = array.first.find_index(value_column)
-      array.each do |row|
+      array.each_with_index do |row, index|
+        next if index.zero?
         if row[i]
           value = row[i].downcase
           uri = map[value]
-          row[i] = uri if uri
+          if uri
+            row[i] = uri
+          else
+            raise "could not find uri for #{value}"
+          end
         end
       end
       # rename column to uri_column_name

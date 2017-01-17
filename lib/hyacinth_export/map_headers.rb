@@ -19,13 +19,13 @@ module HyacinthExport
 
       name_headers = csv.headers.map{ |h| /#{prefix}:(nameAffil-\d+):namePartGiven/.match h }.compact.map{ |m| m[1] }
       name_headers.each do |name_prefix|
-        first_index = csv.headers.find_index("#{prefix}:#{name_prefix}:namePartGiven")
-        last_index = csv.headers.find_index("#{prefix}:#{name_prefix}:namePartFamily")
+        first = "#{prefix}:#{name_prefix}:namePartGiven"
+        last = "#{prefix}:#{name_prefix}:namePartFamily"
 
         # Join first and last name fields.
-        (1..csv.array.length-1).each do |row|
-          if (last = csv.array[row][last_index]) && (first = csv.array[row][first_index])
-            csv.array[row][last_index] = "#{last}, #{first}"
+        csv.table.each do |row|
+          if (last_name = row[last]) && (first_name = row[first])
+            row[last] = "#{last_name}, #{first_name}"
           end
         end
 
@@ -36,15 +36,13 @@ module HyacinthExport
 
         # Delete extra name columns no longer needed
         to_delete = [
-          'affilDept', 'namePartGiven', 'affilDept', 'namePartDate', 'affilAffiliation:affilAuIDLocal',
+          'affilDept', 'affilDept-1', 'affilDept-2', 'affilDept-3', 'namePartGiven', 'affilDept', 'namePartDate', 'affilAffiliation:affilAuIDLocal',
           'affilAffiliation:affilEmail', "affilAffiliation:originCountry", 'affilAffiliation:affilOrganization',
           'affilAffiliation:affilDept', 'affilAffiliation:affilDeptOther'
         ].map { |a| "#{name_prefix}:#{a}" }
 
         columns_to_delete.concat(to_delete)
       end
-
-      # Add corporate as nameAffil-(n+1)
 
       # Merge two DOI columns.
       csv.merge_columns('identifier:IDidentifierDOI', 'identifierDOI')
@@ -54,44 +52,54 @@ module HyacinthExport
 
       map = HyacinthExport::Fields::MAP[prefix]
 
-      csv.array.first.map! do |header|
+      csv.headers.each do |header|
         no_prefix_header = header.gsub("#{prefix}:", '')
         if m = /#{prefix}:nameAffil-(\d+):(\w+)/.match(header)
-          num = m[1].to_i + 1
-          field = case m[2]
-                    when 'namePartFamily'
-                      'name_term.value'
-                    when 'nameRoleTerm'
-                      'name_role-1:name_role_term.value'
-                    when 'nameRoleURI'
-                      'name_role-1:name_role_term.uri'
-                    when 'affilAuIDUNI'
-                      'name_uni.value'
-                    else
-                      ''
-                    end
-            "name-#{num+1}:#{field}"
+          name_field_map = {
+            'namePartFamily' => 'name_term.value',
+            'nameRoleTerm'   => 'name_role-1:name_role_term.value',
+            'nameRoleURI'    => 'name_role-1:name_role_term.uri',
+            'affilAuIDUNI'   => 'name_uni.value'
+          }
+          if field = name_field_map[m[2]]
+            num = m[1].to_i + 1 # increment by 1
+            csv.rename_column(header, "name-#{num+1}:#{field}")
+          end
         elsif m = /#{prefix}:subjectTopicKeyword-(\d+)/.match(header)
-          "subject_topic-#{m[1]}:subject_topic_term.value"
+          csv.rename_column(header, "subject_topic-#{m[1]}:subject_topic_term.value")
         elsif map[no_prefix_header] # mapping one-to-one fields
-          map[no_prefix_header]
-        else
-          header
+          csv.rename_column(header, map[no_prefix_header])
         end
       end
 
-      # normalize doi in 'identifierDOI' => 'doi_identifier-1:doi_identifier_value',
+      # normalize doi in 'identifierDOI' => 'doi_identifier-1:doi_identifier_value'
+      csv.table.each do |row|
+        doi = row['doi_identifier-1:doi_identifier_value']
+        if m = /http\:\/\/dx.doi.org\/(.+)/.match(doi)
+          row['doi_identifier-1:doi_identifier_value'] = m[1]
+        end
+      end
 
       # Map role terms from values to uris
       csv.value_to_uri('genre-1:genre_term.value', 'genre-1:genre_term.uri', UriMapping::GENRE_MAP)
       csv.value_to_uri('language-1:language_term.value', 'language-1:language_term.uri', UriMapping::LANGUAGE_MAP)
       # Map corporate role term (first name)
+
+      # converter
       csv.value_to_uri('name-1:name_role-1:name_role_term.value', 'name-1:name_role-1:name_role_term.uri', UriMapping::ROLES_MAP)
 
-      # find all name headers and map to the correct uris
-      headers.each do |name_prefix|
+      # Add name type personal/corporate for /name-\d/
+      csv.headers.each do |header|
+        m = /name-(\d+).name_term.value/.match header
+        next if m.nil?
+        type = (m[1].to_i == 1) ? 'corporate' : 'personal'
+        csv.add_column("name-#{m[1]}:name_term.name_type")
+        csv.table.each do |row|
+          unless row["name-#{m[1]}:name_term.value"].blank?
+            row["name-#{m[1]}:name_term.name_type"] = type
+          end
+        end
       end
-
 
       # Create Hyacinth compatible csv.
       csv.export_to_file

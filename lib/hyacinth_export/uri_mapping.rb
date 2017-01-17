@@ -73,26 +73,5 @@ module HyacinthExport
       'translator' => 'http://id.loc.gov/vocabulary/relators/trl',
       'originator' => 'http://id.loc.gov/vocabulary/relators/org',
     }
-
-
-    def value_to_uri(value_column, uri_column_name, map)
-      # update the values in the value column to uris
-      i = array.first.find_index(value_column)
-      array.each_with_index do |row, index|
-        next if index.zero?
-        if row[i]
-          value = row[i].downcase
-          uri = map[value]
-          if uri
-            row[i] = uri
-          else
-            raise "could not find uri for #{value}"
-          end
-        end
-      end
-      # rename column to uri_column_name
-      array.first[i] = uri_column_name
-      array
-    end
   end
 end

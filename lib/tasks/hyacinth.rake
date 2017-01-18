@@ -46,7 +46,34 @@ namespace :hyacinth do
     HyacinthExport.export_values(items) if items
   end
 
-  task :export_from_acpubarticle10 => :environment do
-    HyacinthExport::MapHeaders.from_acpubarticle10
+  desc 'export template from Hypatia'
+  task :export_from_hypatia => :environment do
+    if ENV['item_type']
+      limit = ENV['limit'] ? ENV['limit'].to_i : nil
+      item_type = ENV['item_type'].to_i
+      items = if limit
+                Item.where(item_type_id: item_type).limit(limit)
+              else
+                Item.where(item_type_id: item_type)
+              end
+    else
+      puts "pass item_type=ID [limit=LIMIT]"
+    end
+
+    code = ItemType.find(item_type).element.code
+    filename = File.join(Rails.root, 'tmp', 'data', "#{code}-export-from-hypatia.csv")
+    HyacinthExport.export_values(items, filename)
+  end
+
+  desc 'convert hypatia csv to hyacinth csv'
+  task :create_hyacinth_csv => :environment do
+    if ENV['item_type_code']
+      code = ENV['item_type_code']
+      filename = ENV['filename'] || File.join(Rails.root, 'tmp', 'data', "#{code}-export-from-hypatia.csv")
+    else
+      puts "pass item_type_code=code [filename=filename]"
+    end
+
+    HyacinthExport::MapHeaders.send("from_#{code.downcase}", filename)
   end
 end

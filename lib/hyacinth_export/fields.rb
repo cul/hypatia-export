@@ -6,6 +6,7 @@ module HyacinthExport
       'acPubArticle10' => {
         'abstract'                   => 'abstract-1:abstract_value',
         'typeResc'                   => 'type_of_resource-1:type_of_resource_value',
+        'originInfoEdition'          => 'edition-1:edition_value',
         'originDateIssued'           => 'date_issued-1:date_issued_start_value',
         'noteField'                  => 'note-1:note_value',
         'genreGenre'                 => 'genre-1:genre_term.value',
@@ -27,18 +28,20 @@ module HyacinthExport
 
       },
       'acETD' => {
+        'abstract'                 => 'abstract-1:abstract_value',
+        'genre'                    => 'genre-1:genre_term.value',
+        'identifierHDL'            => 'cnri_handle_identifier-1:cnri_handle_identifier_value',
+        'identifierISBN'           => 'isbn-1:isbn_value',
+        'language'                 => 'language-1:language_term.value',
+        'note'                     => 'note-1:note_value',
+        'originInfoDateIssued'     => 'date_issued-1:date_issued_start_value',
+        'originInfoPlace'          => 'place_of_origin-1:place_of_origin_value',
+        'originInfoPublisher'      => 'publisher-1:publisher_value',
+        'title'                    => 'title-1:title_sort_portion',
+        'typeOfResource'           => 'type_of_resource-1:type_of_resource_value',
         'degreeInfo:degreeGrantor' => 'degree-1:degree_grantor',
-        'degreeInfo:degreeName' => 'degree-1:degree_name',
-        'genre'                 => 'genre-1:genre_term.value',
-        'identifierHDL'         => 'cnri_handle_identifier-1:cnri_handle_identifier_value',
-        'identifierISBN'        => 'isbn-1:isbn_value',
-        'language'              => 'language-1:language_term.value',
-        'note'                  => 'note-1:note_value',
-        'originInfoDateIssued'  => 'date_issued-1:date_issued_start_value',
-        'originInfoPlace'       => 'place_of_origin-1:place_of_origin_value',
-        'originInfoPublisher'   => 'publisher-1:publisher_value',
-        'title'                 => 'title-1:title_sort_portion',
-        'typeOfResource'        => 'type_of_resource-1:type_of_resource_value'
+        'degreeInfo:degreeName'    => 'degree-1:degree_name',
+        'RIOXX:Funder'             => 'funding-1:funding_funder_term.value',
       }
     }
   end

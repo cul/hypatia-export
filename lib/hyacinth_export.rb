@@ -47,14 +47,7 @@ module HyacinthExport
     end
   end
 
-  # Exporting with cached values. Does not require a db connection.
-  def self.export_values(items)
-    elements_to_codes = elements_to_codes
-
-    # items = {'2240' => 'ac:128939', '3063' => 'ac:130062', '3064' => 'ac:130066'}
-    # values for 3 items, cached
-    # values = CSV.read('fixtures/data/values.csv')
-
+  def self.export_values(items, filename)
     elements_to_codes = HyacinthExport.elements_to_codes
 
     headers = []
@@ -67,7 +60,7 @@ module HyacinthExport
     end
     headers.uniq!
     headers.sort!
-    ::CSV.open("tmp/data/test-export-values.csv",'w') do |csv|
+    ::CSV.open(filename,'w') do |csv|
       csv.add_row(headers)
       value_maps.each do |value_map|
         row_values = headers.collect { |tag| value_map[tag] }

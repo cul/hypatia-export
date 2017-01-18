@@ -8,7 +8,7 @@ module HyacinthExport
     attr_accessor :table, :prefix
 
     def initialize(filename, prefix: '')
-      array_of_arrays = ::CSV.read(filename)
+      array_of_arrays = ::CSV.read(filename, encoding: 'ISO8859-1')
       headers = array_of_arrays.first
       array_of_rows = array_of_arrays.drop(1).map { |r| ::CSV::Row.new(headers, r) }
       self.table = ::CSV::Table.new(array_of_rows)
@@ -45,8 +45,8 @@ module HyacinthExport
       to = "#{prefix}:#{to}"
       self.table.each do |row|
         # throw an error is both columns have a value and the value is not the same
-        if !row[from].blank? && !row[to].blank?
-          raise "Cannot merge #{from} and #{to} on row: #{i}. Please merge manually."
+        if !row[from].blank? && !row[to].blank? && row[to] != row[from]
+          raise "Cannot merge #{from} and #{to}. Please merge manually."
         end
         row[to] = row[from] || row[to]
       end
@@ -75,12 +75,29 @@ module HyacinthExport
    end
 
     def export_to_file
-      filename = File.join(Rails.root, 'tmp', 'data', "#{self.prefix}-export-to-hypatia.csv")
+      filename = File.join(Rails.root, 'tmp', 'data', "#{self.prefix}-import-to-hyacinth.csv")
 
-      ::CSV.open(filename, 'w') do |csv|
+      ::CSV.open(filename, 'w', encoding: 'ISO8859-1') do |csv|
        self.table.to_a.each { |row| csv.add_row(row) }
       end
       filename
+    end
+
+    def normalize_doi(column_name)
+      self.table.each do |row|
+        doi = row[column_name]
+        if m = /http\:\/\/dx.doi.org\/(.+)/.match(doi)
+          row[column_name] = m[1]
+        end
+      end
+    end
+
+    def combine_name(first_name_column, last_name_column)
+      self.table.each do |row|
+        if (last_name = row[last_name_column]) && (first_name = row[first_name_column])
+          row[last_name_column] = "#{last_name}, #{first_name}"
+        end
+      end
     end
   end
 end

@@ -1,14 +1,11 @@
 require 'csv'
-require 'hyacinth_export/uri_mapping'
 
 module HyacinthExport
   class CSV
-    include HyacinthExport::UriMapping
-
     attr_accessor :table, :prefix
 
     def initialize(filename, prefix: '')
-      array_of_arrays = ::CSV.read(filename, encoding: 'ISO8859-1')
+      array_of_arrays = ::CSV.read(filename, encoding: 'UTF-8')
       headers = array_of_arrays.first
       array_of_rows = array_of_arrays.drop(1).map { |r| ::CSV::Row.new(headers, r) }
       self.table = ::CSV::Table.new(array_of_rows)
@@ -55,29 +52,27 @@ module HyacinthExport
       delete_columns([from], with_prefix: true)
     end
 
-   def value_to_uri(value_column, uri_column_name, map)
+   def value_to_uri(value_column, uri_column_name, map, case_sensitive: false)
      # update the values in the value column to uris
+     add_column(uri_column_name)
      self.table.each do |row|
        if row[value_column]
-         value = row[value_column].downcase
+         value = row[value_column]
+         value = value.downcase unless case_sensitive
          uri = map[value]
          if uri
-           row[value_column] = uri
+           row[uri_column_name] = uri
          else
-           raise "could not find uri for #{value}"
+           raise "could not find matching value for #{value}"
          end
        end
      end
-     # rename column to uri_column_name
-     rename_column(value_column, uri_column_name)
-     # array.first[i] = uri_column_name
-     # array
    end
 
     def export_to_file
       filename = File.join(Rails.root, 'tmp', 'data', "#{self.prefix}-import-to-hyacinth.csv")
 
-      ::CSV.open(filename, 'w', encoding: 'ISO8859-1') do |csv|
+      ::CSV.open(filename, 'w', encoding: 'UTF-8') do |csv|
        self.table.to_a.each { |row| csv.add_row(row) }
       end
       filename

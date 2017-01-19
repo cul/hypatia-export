@@ -35,6 +35,7 @@ module HyacinthExport
       'technical reports' => 'http://vocab.getty.edu/aat/300027267',
       'technical report' => 'http://vocab.getty.edu/aat/300027267',
       'undergraduate theses' => 'http://vocab.getty.edu/aat/300028028',
+      'thesis, undergraduate' => 'http://vocab.getty.edu/aat/300028028',
       'unpublished papers' => 'http://vocab.getty.edu/aat/300027267',
       'websites' => 'http://vocab.getty.edu/aat/300027267',
       'working papers' => 'http://vocab.getty.edu/aat/300027267',

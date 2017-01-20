@@ -39,7 +39,7 @@ module HyacinthExport
       'unpublished papers' => 'http://vocab.getty.edu/aat/300027267',
       'websites' => 'http://vocab.getty.edu/aat/300027267',
       'working papers' => 'http://vocab.getty.edu/aat/300027267',
-      'working paper' => 'http://vocab.getty.edu/aat/300027267'
+      'working paper' => 'http://vocab.getty.edu/aat/300027267',
     }
 
     LANGUAGE_MAP = {
@@ -73,6 +73,7 @@ module HyacinthExport
       'thesis advisor' => 'http://id.loc.gov/vocabulary/relators/ths',
       'translator' => 'http://id.loc.gov/vocabulary/relators/trl',
       'originator' => 'http://id.loc.gov/vocabulary/relators/org',
+      'author of screenplay' => 'http://id.loc.gov/vocabulary/relators/aut',
     }
   end
 end

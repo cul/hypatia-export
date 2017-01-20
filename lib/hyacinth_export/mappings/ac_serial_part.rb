@@ -1,42 +1,37 @@
 module HyacinthExport::Mappings
-  module AcEtd
+  module AcSerialPart
     def self.included(base)
       base.extend ClassMethods
     end
 
     module ClassMethods
-      DEGREE_TO_NUM = {
-        'Senior Thesis' => 0, 'Senior thesis' => 0, 'B.A.' => 0, 'M.F.A.' => 1,
-        'M.P.H.' => 1, 'M.A.' => 1, 'M.Div.' => 1, 'M.S.' => 1, 'Ph.D.' => 2,
-        'Ed.D.' => 2, 'Dr.P.H.' => 2, 'J.S.D.' => 2, 'D.M.A.' => 2,
-      }
-      PREFIX = 'acETD'
+      PREFIX = 'acSerialPart'
       MAP = {
         'abstract'                 => 'abstract-1:abstract_value',
         'genre'                    => 'genre-1:genre_term.value',
         'identifierHDL'            => 'cnri_handle_identifier-1:cnri_handle_identifier_value',
-        'identifierISBN'           => 'isbn-1:isbn_value',
         'ezid'                     => 'doi_identifier-1:doi_identifier_value',
         'language'                 => 'language-1:language_term.value',
-        'note'                     => 'note-1:note_value',
         'originInfoDateIssued'     => 'date_issued-1:date_issued_start_value',
         'originInfoPlace'          => 'place_of_origin-1:place_of_origin_value',
         'originInfoPublisher'      => 'publisher-1:publisher_value',
         'title'                    => 'title-1:title_sort_portion',
         'typeOfResource'           => 'type_of_resource-1:type_of_resource_value',
-        'degreeInfo:degreeGrantor' => 'degree-1:degree_grantor',
-        'degreeInfo:degreeName'    => 'degree-1:degree_name',
-        'embargo:embargoRelease'   => 'embargo_release_date-1:embargo_release_date_value',
+        'relatedItemHost:host_title'          => 'parent_publication-1:parent_publication_title-1:parent_publication_title_sort_portion',
+        'relatedItemHost:identifierDOI'       => 'parent_publication-1:parent_publication_doi',
+        'relatedItemHost:identifierISSN'      => 'parent_publication-1:parent_publication_issn',
+        'relatedItemHost:partDate'            => 'parent_publication-1:parent_publication_date_created_textual',
+        'relatedItemHost:partDetailIssue'     => 'parent_publication-1:parent_publication_issue',
+        'relatedItemHost:partDetailVolume'    => 'parent_publication-1:parent_publication_volume',
+        'relatedItemHost:partExtentPageEnd'   => 'parent_publication-1:parent_publication_page_end',
+        'relatedItemHost:partExtentPageStart' => 'parent_publication-1:parent_publication_page_start',
       }
 
-      # Map CSV headers from acETD Hypatia csv to Hyacinth compatible csv
-      def from_acetd(filename)
+      def from_acserialpart(filename)
         csv = HyacinthExport::CSV.new(filename, prefix: PREFIX)
 
         csv.delete_columns(%w{
-          copyright:copyrightNotice copyright:creativeCommonsLicense tableOfContents
-          RIOXX:Funder RIOXX:Grant attachment embargo:embargoLength embargo:embargoNote
-          embargo:embargoStart
+          tableOfContents
         })
 
         # Map personal names
@@ -66,20 +61,20 @@ module HyacinthExport::Mappings
         end
 
         # Map corporate names
-        corporate_matches = csv.headers.map { |h| /#{PREFIX}:(nameCorporate-?(\d*)):namePart/.match(h) }.compact
-        corporate_matches.each do |name|
-          num = name_matches.count + name[2].to_i + 1
-
-          role_match = csv.headers.map { |h| /#{PREFIX}:#{name[1]}:role-?(\d*)/.match(h) }.compact
-          role_match.each do |role|
-            new_column = "name-#{num}:name_role-#{role[1].to_i + 1}:name_role_term.value"
-            csv.rename_column(role.string, "name-#{num}:name_role-#{role[1].to_i + 1}:name_role_term.value")
-            csv.value_to_uri(new_column, new_column.gsub('.value', '.uri'), HyacinthExport::UriMapping::ROLES_MAP)
-          end
-
-          csv.rename_column(name.string, "name-#{num}:name_term.value")
-          csv.add_name_type(num: num, type: 'corporate')
-        end
+        # corporate_matches = csv.headers.map { |h| /#{PREFIX}:(nameCorporate-?(\d*)):namePart/.match(h) }.compact
+        # corporate_matches.each do |name|
+        #   num = name_matches.count + name[2].to_i + 1
+        #
+        #   role_match = csv.headers.map { |h| /#{PREFIX}:#{name[1]}:role-?(\d*)/.match(h) }.compact
+        #   role_match.each do |role|
+        #     new_column = "name-#{num}:name_role-#{role[1].to_i + 1}:name_role_term.value"
+        #     csv.rename_column(role.string, "name-#{num}:name_role-#{role[1].to_i + 1}:name_role_term.value")
+        #     csv.value_to_uri(new_column, new_column.gsub('.value', '.uri'), HyacinthExport::UriMapping::ROLES_MAP)
+        #   end
+        #
+        #   csv.rename_column(name.string, "name-#{num}:name_term.value")
+        #   csv.add_name_type(num: num, type: 'corporate')
+        # end
 
         # Mapping rest of columns.
         columns_to_add = []
@@ -105,11 +100,6 @@ module HyacinthExport::Mappings
         end
 
         columns_to_add.each { |c| csv.add_column(c) }
-
-        # Degree and URI Mappings
-        csv.value_to_uri('degree-1:degree_name', 'degree-1:degree_level', DEGREE_TO_NUM, case_sensitive: true)
-        csv.value_to_uri('genre-1:genre_term.value', 'genre-1:genre_term.uri', HyacinthExport::UriMapping::GENRE_MAP)
-        csv.value_to_uri('language-1:language_term.value', 'language-1:language_term.uri', HyacinthExport::UriMapping::LANGUAGE_MAP)
 
         csv.export_to_file
       end

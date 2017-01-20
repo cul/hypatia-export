@@ -17,10 +17,10 @@ module HyacinthExport
     end
 
     def delete_columns(column_names, with_prefix: false)
-     column_names.each do |n|
-       n = "#{self.prefix}:#{n}" unless with_prefix
-       self.table.delete(n)
-     end
+      column_names.each do |n|
+        n = "#{self.prefix}:#{n}" unless with_prefix
+        self.table.delete(n)
+      end
     end
 
     def add_column(name, default_content: nil)
@@ -52,28 +52,27 @@ module HyacinthExport
       delete_columns([from], with_prefix: true)
     end
 
-   def value_to_uri(value_column, uri_column_name, map, case_sensitive: false)
-     # update the values in the value column to uris
-     add_column(uri_column_name)
-     self.table.each do |row|
-       if row[value_column]
-         value = row[value_column]
-         value = value.downcase unless case_sensitive
-         uri = map[value]
-         if uri
-           row[uri_column_name] = uri
-         else
-           raise "could not find matching value for #{value}"
-         end
-       end
-     end
-   end
+    def value_to_uri(value_column, uri_column_name, map, case_sensitive: false)
+      # update the values in the value column to uris
+      add_column(uri_column_name)
+      self.table.each do |row|
+        next if row[value_column].blank?
+        value = row[value_column]
+        value = value.downcase unless case_sensitive
+        uri = map[value]
+        if uri
+          row[uri_column_name] = uri
+        else
+          raise "could not find matching value for #{value}"
+        end
+      end
+    end
 
     def export_to_file
       filename = File.join(Rails.root, 'tmp', 'data', "#{self.prefix}-import-to-hyacinth.csv")
 
       ::CSV.open(filename, 'w', encoding: 'UTF-8') do |csv|
-       self.table.to_a.each { |row| csv.add_row(row) }
+        self.table.to_a.each { |row| csv.add_row(row) }
       end
       filename
     end
@@ -85,6 +84,15 @@ module HyacinthExport
           row[column_name] = m[1]
         end
       end
+    end
+
+    def add_name_type(num:, type:)
+       add_column("name-#{num}:name_term.name_type")
+       self.table.each do |row|
+         unless row["name-#{num}:name_term.value"].blank?
+           row["name-#{num}:name_term.name_type"] = type
+         end
+       end
     end
 
     def combine_name(first_name_column, last_name_column)

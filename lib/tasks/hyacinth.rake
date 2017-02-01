@@ -43,7 +43,9 @@ namespace :hyacinth do
       puts "pass items=ID,ID,ID... or item_type=ID [limit=LIMIT]"
     end
 
-    HyacinthExport.export_values(items) if items
+    filename = File.join(Rails.root, 'tmp', 'data', "individual-item-export-from-hypatia.csv")
+    items = [items] unless items.respond_to? :each
+    HyacinthExport.export_values(items, filename) if items
   end
 
   desc 'export template from Hypatia'

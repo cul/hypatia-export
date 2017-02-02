@@ -30,7 +30,7 @@ module Values
     unless elements_to_codes[value.element_id]
       elements_to_codes[value.element_id] = value.element.code
     end
-    
+
     code = elements_to_codes[value.element_id]
     children_by_code[code] << value
    end
@@ -40,7 +40,7 @@ module Values
      if element_values.length > 1
        element_values.each_with_index do |element_value, ix|
 
-         ix_tag = (parent_id && !ix.zero?) ? "#{tag}-#{ix + 1}" : tag # don't index root element and don't add suffix if first element
+         ix_tag = (parent_id && !ix.zero?) ? "#{tag}-#{ix}" : tag # don't index root element and don't add suffix if first element
          if element_value.data
            value_map[ix_tag] = element_value.data
          end

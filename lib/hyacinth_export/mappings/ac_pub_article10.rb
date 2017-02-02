@@ -29,68 +29,62 @@ module HyacinthExport::Mappings
         'relatedArticleHost:partVolume'       => 'parent_publication-1:parent_publication_volume',
         'relatedArticleHost:tiInfoTitle'      => 'parent_publication-1:parent_publication_title-1:parent_publication_title_sort_portion',
         'nameTypeCorporate:namePart'          => 'name-1:name_term.value',
-        'nameTypeCorporate:nameRoleTerm'      => 'name-1:name_role-1:name_role_term.value'
+        'nameTypeCorporate:nameRoleTerm'      => 'name-1:name_role-1:name_role_term.value',
+        'nameTypeCorporate:nameRoleTerm-1'    => 'name-1:name_role-2:name_role_term.value'
       }
 
       # Map CSV headers from acPubArticle10 Hypatia csv to Hyacinth compatible csv
       def from_acpubarticle10(filename)
-        prefix = PREFIX # Template prefix
-        csv = HyacinthExport::CSV.new(filename, prefix: prefix)
+        csv = HyacinthExport::CSV.new(filename, prefix: PREFIX)
 
-        columns_to_delete = %w{
+        csv.delete_columns(%w{
           copyEmbargo:EmRsrcVsbl copyEmbargo:copyEmAccessLevel copyEmbargo:copyEmDateBegin
           copyEmbargo:copyEmIssuedBy copyEmbargo:copyEmNote
           extAuthorRightsStatement identifier:IDidentifierURI locURL identifier:iDIdentifierLocal
-          identifier:identifierType nameAffil-2:affilAffiliation:affilAuIDNAF
-          physDsExtentFileSize physDsInternetMediaType recInfRecordOrigin tiInfoSubTitle Attachments
-          subjectGeoCode subjectTopicKeyword relatedArticleHost:identifierDOI nameAffil-1:affilAffiliation:affilAuIDNAF
-          nameAffil-2:affilAffiliation:affilAuIDNAF nameTypeCorporate:nameRoleTerm-1
-          nameTypeCorporate:nameRoleTerm-2 physDsExtentPages relatedArticleHost:identifier:identifierDOI relatedArticleHost:identifier:identifierType
-        }
+          identifier:identifierType physDsExtentFileSize physDsInternetMediaType recInfRecordOrigin
+          tiInfoSubTitle Attachments subjectGeoCode subjectTopicKeyword relatedArticleHost:identifierDOI
+          physDsExtentPages relatedArticleHost:identifier:identifierDOI relatedArticleHost:identifier:identifierType
+        })
 
-        to_delete = csv.headers.select { |h| /#{prefix}:(copyright|subjectTopicCU-\d+|relatedItemReferences(-\d)?):?.*/.match(h) }
-        to_delete.map! { |h| /#{prefix}:(.*)/.match(h)[1] }
-        columns_to_delete.concat(to_delete)
+        to_delete = csv.headers.select { |h| /#{PREFIX}:(copyright|subjectTopicCU(-\d+)?|relatedItemReferences(-\d)?):?.*/.match(h) }
+        csv.delete_columns(to_delete, with_prefix: true)
 
-        name_headers = csv.headers.map{ |h| /#{prefix}:(nameAffil-\d+):namePartGiven/.match h }.compact.map{ |m| m[1] }
-        name_headers.each do |name_prefix|
-          # Join first and last name fields.
-          csv.combine_name("#{prefix}:#{name_prefix}:namePartGiven", "#{prefix}:#{name_prefix}:namePartFamily")
+        # Map personal names
+        name_matches = csv.headers.map{ |h| /#{PREFIX}:(nameAffil-?(\d*)):namePartFamily/.match(h) }.compact
+        name_matches.each do |name|
+          csv.combine_name("#{PREFIX}:#{name[1]}:namePartGiven", "#{PREFIX}:#{name[1]}:namePartFamily")
+          csv.merge_columns("#{name[1]}:affilAffiliation:affilAuIDUNI", "#{name[1]}:affilAuIDUNI")
 
-          csv.merge_columns("#{name_prefix}:affilAffiliation:affilAuIDUNI", "#{name_prefix}:affilAuIDUNI")
+          num = name[2].to_i + 2
+
+          csv.rename_column("#{PREFIX}:#{name[1]}:affilAuIDUNI", "name-#{num}:name_term.uni")
+          csv.rename_column(name.string, "name-#{num}:name_term.value")
+
+          # Role uri
+          role_column = "name-#{num}:name_role-1:name_role_term.value"
+          csv.rename_column("#{PREFIX}:#{name[1]}:nameRoleTerm", role_column)
+          csv.value_to_uri(role_column, role_column.gsub('.value', '.uri'), HyacinthExport::UriMapping::ROLES_MAP)
+
+          csv.add_name_type(num: num, type: 'personal')
 
           # Delete extra name columns no longer needed
           to_delete = [
-            'affilDept', 'affilDept-1', 'affilDept-2', 'affilDept-3', 'namePartGiven', 'affilDept', 'namePartDate', 'affilAffiliation:affilAuIDLocal',
-            'affilAffiliation:affilEmail', "affilAffiliation:originCountry", 'affilAffiliation:affilOrganization',
-            'affilAffiliation:affilDept', 'affilAffiliation:affilDeptOther'
-          ].map { |a| "#{name_prefix}:#{a}" }
-
-          columns_to_delete.concat(to_delete)
+            'affilDept', 'affilDept-1', 'affilDept-2', 'affilDept-3', 'namePartGiven', 'affilDept', 'namePartDate',
+            'affilAffiliation:affilAuIDLocal', 'affilAffiliation:affilEmail', 'affilAffiliation:originCountry',
+            'affilAffiliation:affilOrganization', 'affilAffiliation:affilDept', 'affilAffiliation:affilDeptOther',
+            'affilAffiliation:affilDeptOther-1', 'affilAffiliation:affilAuIDNAF'
+          ].map { |a| "#{name[1]}:#{a}" }
+          csv.delete_columns(to_delete)
         end
 
         # Normalize and merge two DOI columns.
-        # Normalize doi in acPubArticle10:identifier:IDidentifierDOI
         csv.normalize_doi('acPubArticle10:identifier:IDidentifierDOI')
         csv.normalize_doi('acPubArticle10:identifierDOI')
         csv.merge_columns('identifier:IDidentifierDOI', 'identifierDOI')
 
-        # Delete columns that are no necessary for export.
-        csv.delete_columns(columns_to_delete)
-
         csv.headers.each do |header|
-          no_prefix_header = header.gsub("#{prefix}:", '')
-          if m = /#{prefix}:nameAffil-(\d+):(\w+)/.match(header)
-            name_field_map = {
-              'namePartFamily' => 'name_term.value',
-              'nameRoleTerm'   => 'name_role-1:name_role_term.value',
-              'affilAuIDUNI'   => 'name_uni.value'
-            }
-            if field = name_field_map[m[2]]
-              num = m[1].to_i + 1 # increment by 1
-              csv.rename_column(header, "name-#{num}:#{field}")
-            end
-          elsif m = /#{prefix}:subjectTopicKeyword-(\d+)/.match(header)
+          no_prefix_header = header.gsub("#{PREFIX}:", '')
+          if m = /#{PREFIX}:subjectTopicKeyword-(\d+)/.match(header)
             csv.rename_column(header, "subject_topic-#{m[1]}:subject_topic_term.value")
           elsif MAP[no_prefix_header] # mapping one-to-one fields
             csv.rename_column(header, MAP[no_prefix_header])
@@ -101,49 +95,12 @@ module HyacinthExport::Mappings
         csv.value_to_uri('genre-1:genre_term.value', 'genre-1:genre_term.uri', HyacinthExport::UriMapping::GENRE_MAP)
         csv.value_to_uri('language-1:language_term.value', 'language-1:language_term.uri', HyacinthExport::UriMapping::LANGUAGE_MAP)
 
-        num_names = csv.headers.select{ |h| /name-(\d+).name_term.value/.match(h) }.count
+        # Add type for first (corporate) name.
+        csv.add_name_type(num: 1, type: 'corporate')
 
-        # Merging in nameAffil
-        csv.combine_name('acPubArticle10:nameAffil:namePartGiven', 'acPubArticle10:nameAffil:namePartFamily')
-        csv.table.each do |row|
-          name = row['acPubArticle10:nameAffil:namePartFamily']
-          next if name.blank?
-          uni = row['acPubArticle10:nameAffil:affilAuIDUNI']
-          role_value = row['acPubArticle10:nameAffil:nameRoleTerm']
-
-          (2..num_names).each do |num|
-            if row["name-#{num}:name_term.value"].blank?
-              row["name-#{num}:name_term.value"] = name
-              row["name-#{num}:name_uni.value"] = uni
-              row["name-#{num}:name_role-1:name_role_term.value"] = role_value
-              break
-              # add data in this column
-            else num == num_names # if last one, create new row
-              puts 'creating new columns'
-              csv.add_column("name-#{num+1}:name_term.value")
-              csv.add_column("name-#{num+1}:name_uni.value")
-              csv.add_column("name-#{num+1}:name_role-1:name_role_term.value")
-              row["name-#{num+1}:name_term.value"] = name
-              row["name-#{num+1}:name_uni.value"] = uni
-              row["name-#{num+1}:name_role-1:name_role_term.value"] = role_value
-            end
-          end
-        end
-        csv.delete_columns(csv.headers.select{ |h| /acPubArticle10:nameAffil:.*/.match(h) }, with_prefix: true)
-
-        # Add name type personal/corporate for /name-\d/
-        # Convert role term to uri for all names
-        (1..num_names).each do |num|
-          type = (num == 1) ? 'corporate' : 'personal'
-          csv.add_column("name-#{num}:name_term.name_type")
-          csv.table.each do |row|
-            unless row["name-#{num}:name_term.value"].blank?
-              row["name-#{num}:name_term.name_type"] = type
-            end
-          end
-
-          csv.value_to_uri("name-#{num}:name_role-1:name_role_term.value", "name-#{num}:name_role-1:name_role_term.uri", HyacinthExport::UriMapping::ROLES_MAP)
-        end
+        # Add role uri for corporate name.
+        csv.value_to_uri("name-1:name_role-1:name_role_term.value", "name-1:name_role-1:name_role_term.uri", HyacinthExport::UriMapping::ROLES_MAP)
+        csv.value_to_uri("name-1:name_role-2:name_role_term.value", "name-1:name_role-2:name_role_term.uri", HyacinthExport::UriMapping::ROLES_MAP)
 
         # Create Hyacinth compatible csv.
         csv.export_to_file

@@ -39,7 +39,7 @@ module HyacinthExport::Mappings
 
         csv.delete_columns(%w{
           copyEmbargo:EmRsrcVsbl copyEmbargo:copyEmAccessLevel copyEmbargo:copyEmDateBegin
-          copyEmbargo:copyEmIssuedBy copyEmbargo:copyEmNote
+          copyEmbargo:copyEmIssuedBy copyEmbargo:copyEmNote copyEmbargo:EmPeerReview
           extAuthorRightsStatement identifier:IDidentifierURI locURL identifier:iDIdentifierLocal
           identifier:identifierType physDsExtentFileSize physDsInternetMediaType recInfRecordOrigin
           tiInfoSubTitle Attachments subjectGeoCode subjectTopicKeyword relatedArticleHost:identifierDOI
@@ -48,6 +48,9 @@ module HyacinthExport::Mappings
 
         to_delete = csv.headers.select { |h| /#{PREFIX}:(copyright|subjectTopicCU(-\d+)?|relatedItemReferences(-\d)?):?.*/.match(h) }
         csv.delete_columns(to_delete, with_prefix: true)
+
+        # Merge issn columns
+        csv.merge_columns('relatedArticleHost:iDIdentifierISSN-1', 'relatedArticleHost:iDIdentifierISSN')
 
         # Map personal names
         name_matches = csv.headers.map{ |h| /#{PREFIX}:(nameAffil-?(\d*)):namePartFamily/.match(h) }.compact

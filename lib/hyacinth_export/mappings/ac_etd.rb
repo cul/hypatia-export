@@ -39,6 +39,9 @@ module HyacinthExport::Mappings
           embargo:embargoStart
         })
 
+        # Merge note columns.
+        csv.merge_columns('note-1', 'note')
+
         # Map personal names
         name_matches = csv.headers.map { |h| /#{PREFIX}:(namePersonal-?(\d*)):namePartFamily/.match(h) }.compact
         name_matches.each do |name|

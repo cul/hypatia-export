@@ -34,7 +34,7 @@ module HyacinthExport::Mappings
         csv = HyacinthExport::CSV.new(filename, prefix: PREFIX)
 
         csv.delete_columns(%w{
-          copyright:copyrightNotice copyright:creativeCommonsLicense tableOfContents
+          _hypatia_id copyright:copyrightNotice copyright:creativeCommonsLicense tableOfContents
           RIOXX:Funder RIOXX:Grant attachment embargo:embargoLength embargo:embargoNote
           embargo:embargoStart
         })
@@ -84,7 +84,7 @@ module HyacinthExport::Mappings
           csv.add_name_type(num: num, type: 'corporate')
         end
 
-        # Mapping rest of columns.
+        # Mapping rest of columns
         columns_to_add = []
         num_fast = csv.headers.select{ |h| /#{PREFIX}:FAST-?(\d+)?:FASTURI/.match(h) }.count
         csv.headers.each do |header|

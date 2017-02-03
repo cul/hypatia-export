@@ -2,14 +2,21 @@ require 'csv'
 
 module HyacinthExport
   class CSV
-    attr_accessor :table, :prefix
+    attr_accessor :table, :prefix, :export_filepath, :import_filepath
 
-    def initialize(filename, prefix: '')
-      array_of_arrays = ::CSV.read(filename, encoding: 'UTF-8')
+    def initialize(export_filepath, import_filepath, prefix: '')
+      self.prefix = prefix
+      self.export_filepath = export_filepath
+      self.import_filepath = import_filepath
+
+      array_of_arrays = ::CSV.read(self.export_filepath, encoding: 'UTF-8')
       headers = array_of_arrays.first
       array_of_rows = array_of_arrays.drop(1).map { |r| ::CSV::Row.new(headers, r) }
       self.table = ::CSV::Table.new(array_of_rows)
-      self.prefix = prefix
+
+      # Add project column and remove _hypatia_id
+      add_column('_project.string_key', default_content: 'academic_commons')
+      delete_columns(['_hypatia_id'], with_prefix: true)
     end
 
     def headers
@@ -69,12 +76,9 @@ module HyacinthExport
     end
 
     def export_to_file
-      filename = File.join(Rails.root, 'tmp', 'data', "#{self.prefix}-import-to-hyacinth.csv")
-
-      ::CSV.open(filename, 'w', encoding: 'UTF-8') do |csv|
+      ::CSV.open(self.import_filepath, 'w', encoding: 'UTF-8') do |csv|
         self.table.to_a.each { |row| csv.add_row(row) }
       end
-      filename
     end
 
     def normalize_doi(column_name)

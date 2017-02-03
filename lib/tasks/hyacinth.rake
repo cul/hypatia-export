@@ -53,18 +53,31 @@ namespace :hyacinth do
     if ENV['item_type']
       limit = ENV['limit'] ? ENV['limit'].to_i : nil
       item_type = ENV['item_type'].to_i
+      in_batches = (ENV['in_batches'] == 'true') ? true : false
       items = if limit
                 Item.where(item_type_id: item_type).limit(limit)
               else
                 Item.where(item_type_id: item_type)
               end
     else
-      puts "pass item_type=ID [limit=LIMIT]"
+      puts "pass item_type=ID [limit=LIMIT] [in_batches=true]"
     end
 
+    # Remove items that should be ignored.
+    do_not_export_filepath = File.expand_path(File.join('~', 'Google Drive', 'Hypatia Export CSVs', 'do_not_export.csv'))
+    ignore = ::CSV.read(do_not_export_filepath).drop(1).map(&:first).map(&:to_i)
+    items = items.reject { |i| ignore.include?(i.id) }
+
     code = ItemType.find(item_type).element.code
-    filename = File.join(Rails.root, 'tmp', 'data', "#{code}-export-from-hypatia.csv")
-    HyacinthExport.export_values(items, filename)
+    if in_batches
+      items.each_slice(500).with_index do |group, idx|
+        filename = File.join(Rails.root, 'tmp', 'data', "#{code}-#{idx+1}-export-from-hypatia.csv")
+        HyacinthExport.export_values(group, filename)
+      end
+    else
+      filename = File.join(Rails.root, 'tmp', 'data', "#{code}-export-from-hypatia.csv")
+      HyacinthExport.export_values(items, filename)
+    end
   end
 
   desc 'convert hypatia csv to hyacinth csv'
@@ -72,10 +85,11 @@ namespace :hyacinth do
     if ENV['item_type_code']
       code = ENV['item_type_code']
       filename = ENV['filename'] || File.join(Rails.root, 'tmp', 'data', "#{code}-export-from-hypatia.csv")
+      # Raise error if filename does not contain 'export-from-hypatia'
     else
       puts "pass item_type_code=code [filename=filename]"
     end
 
-    HyacinthExport::MapHeaders.send("from_#{code.downcase}", filename)
+    HyacinthExport::MapHeaders.send("from_#{code.downcase}", filename, filename.gsub('export-from-hypatia', 'import-to-hyacinth'))
   end
 end

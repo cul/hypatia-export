@@ -31,7 +31,7 @@ module HyacinthExport::Mappings
         csv = HyacinthExport::CSV.new(filename, prefix: PREFIX)
 
         csv.delete_columns(%w{
-          tableOfContents
+          _hypatia_id tableOfContents
         })
 
         # Map personal names
@@ -60,6 +60,8 @@ module HyacinthExport::Mappings
           csv.delete_columns(delete)
         end
 
+
+
         # Map corporate names
         # corporate_matches = csv.headers.map { |h| /#{PREFIX}:(nameCorporate-?(\d*)):namePart/.match(h) }.compact
         # corporate_matches.each do |name|
@@ -82,21 +84,24 @@ module HyacinthExport::Mappings
         csv.headers.each do |header|
           no_prefix_header = header.gsub("#{PREFIX}:", '')
 
-          if m = /#{PREFIX}:FAST-?(\d*):FASTURI/.match(header)
-            csv.rename_column(header, "subject_topic-#{m[1].to_i+1}:subject_topic_term.uri")
-          elsif m = /#{PREFIX}:FAST-?(\d*):FASTSubject/.match(header)
-            csv.rename_column(header, "subject_topic-#{m[1].to_i+1}:subject_topic_term.value")
-          elsif m = /#{PREFIX}:subject-?(\d*)/.match(header)
-            num = m[1].to_i + 1 + num_fast
-            csv.rename_column(header, "subject_topic-#{num}:subject_topic_term.value")
-            columns_to_add.append("subject_topic-#{num}:subject_topic_term.uri")
-          elsif m = /#{PREFIX}:FASTGeo-?(\d*):GeoURI/.match(header)
-            csv.rename_column(header, "subject_geographic-#{m[1].to_i + 1}:subject_geographic_term.uri")
-          elsif m = /#{PREFIX}:FASTGeo-?(\d*):Geo/.match(header)
-            csv.rename_column(header, "subject_geographic-#{m[1].to_i + 1}:subject_geographic_term.value")
-          elsif MAP[no_prefix_header] # mapping one-to-one fields
-            csv.rename_column(header, MAP[no_prefix_header])
-          end
+          new_name = if m = /#{PREFIX}:FAST-?(\d*):FASTURI/.match(header)
+                      "subject_topic-#{m[1].to_i+1}:subject_topic_term.uri"
+                     elsif m = /#{PREFIX}:FAST-?(\d*):FASTSubject/.match(header)
+                       "subject_topic-#{m[1].to_i+1}:subject_topic_term.value"
+                     elsif m = /#{PREFIX}:subject-?(\d*)/.match(header)
+                       num = m[1].to_i + 1 + num_fast
+                       columns_to_add.append("subject_topic-#{num}:subject_topic_term.uri")
+                       "subject_topic-#{num}:subject_topic_term.value"
+                     elsif m = /#{PREFIX}:FASTGeo-?(\d*):GeoURI/.match(header)
+                       "subject_geographic-#{m[1].to_i + 1}:subject_geographic_term.uri"
+                     elsif m = /#{PREFIX}:FASTGeo-?(\d*):Geo/.match(header)
+                       "subject_geographic-#{m[1].to_i + 1}:subject_geographic_term.value"
+                     elsif MAP[no_prefix_header] # mapping one-to-one fields
+                       MAP[no_prefix_header]
+                     else
+                       nil
+                     end
+          csv.rename_column(header, new_name) unless new_name.nil?
         end
 
         columns_to_add.each { |c| csv.add_column(c) }

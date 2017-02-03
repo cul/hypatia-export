@@ -34,8 +34,8 @@ module HyacinthExport::Mappings
       }
 
       # Map CSV headers from acPubArticle10 Hypatia csv to Hyacinth compatible csv
-      def from_acpubarticle10(filename)
-        csv = HyacinthExport::CSV.new(filename, prefix: PREFIX)
+      def from_acpubarticle10(export_filepath, import_filepath)
+        csv = HyacinthExport::CSV.new(export_filepath, import_filepath, prefix: PREFIX)
 
         csv.delete_columns(%w{
           copyEmbargo:EmRsrcVsbl copyEmbargo:copyEmAccessLevel copyEmbargo:copyEmDateBegin

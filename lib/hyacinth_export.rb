@@ -52,15 +52,13 @@ module HyacinthExport
 
     headers = []
     value_maps = items.collect do |item|
-      item_id = item.id
-      pid = item.fedora_pid
-      value_map = Values.accumulate(nil,nil,elements_to_codes,item.values,{ '_pid' => pid })
+      value_map = Values.accumulate(nil,nil,elements_to_codes,item.values,{ '_pid' => item.fedora_pid, '_hypatia_id' => item.id })
       headers += value_map.keys.sort
       value_map
     end
     headers.uniq!
     headers.sort!
-    ::CSV.open(filename,'w') do |csv|
+    ::CSV.open(filename, 'w', encoding: 'UTF-8') do |csv|
       csv.add_row(headers)
       value_maps.each do |value_map|
         row_values = headers.collect { |tag| value_map[tag] }

@@ -31,7 +31,7 @@ module HyacinthExport::Mappings
         csv = HyacinthExport::CSV.new(filename, prefix: PREFIX)
 
         csv.delete_columns(%w{
-          _hypatia_id tableOfContents
+          tableOfContents
         })
 
         # Map personal names

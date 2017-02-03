@@ -25,7 +25,7 @@ module HyacinthExport::Mappings
           copyright:copyCopyStatement extAuthorRightsStatement locURL noteRef
           originEdition physDsExtentFileSize physDsInternetMediaType recInfRecordOrigin
           relatedItemSeries:nameTitleGroup relatedItemSeries:relatedItemID subjectGeoCode
-          tableOfContents _hypatia_id
+          tableOfContents
         })
 
         csv.headers.each do |header|

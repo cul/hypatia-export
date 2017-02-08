@@ -42,7 +42,7 @@ module HyacinthExport::Mappings
           copyEmbargo:copyEmIssuedBy copyEmbargo:copyEmNote copyEmbargo:EmPeerReview
           extAuthorRightsStatement identifier:IDidentifierURI locURL identifier:iDIdentifierLocal
           identifier:identifierType physDsExtentFileSize physDsInternetMediaType recInfRecordOrigin
-          tiInfoSubTitle Attachments subjectGeoCode subjectTopicKeyword relatedArticleHost:identifierDOI
+          tiInfoSubTitle Attachments subjectGeoCode relatedArticleHost:identifierDOI
           physDsExtentPages relatedArticleHost:identifier:identifierDOI relatedArticleHost:identifier:identifierType
         })
 
@@ -87,8 +87,8 @@ module HyacinthExport::Mappings
 
         csv.headers.each do |header|
           no_prefix_header = header.gsub("#{PREFIX}:", '')
-          if m = /#{PREFIX}:subjectTopicKeyword-(\d+)/.match(header)
-            csv.rename_column(header, "subject_topic-#{m[1]}:subject_topic_term.value")
+          if m = /#{PREFIX}:subjectTopicKeyword-?(\d*)/.match(header)
+            csv.rename_column(header, "subject_topic-#{m[1].to_i + 1}:subject_topic_term.value")
           elsif MAP[no_prefix_header] # mapping one-to-one fields
             csv.rename_column(header, MAP[no_prefix_header])
           end

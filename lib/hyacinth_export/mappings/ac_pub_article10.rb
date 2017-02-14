@@ -105,6 +105,8 @@ module HyacinthExport::Mappings
         csv.value_to_uri("name-1:name_role-1:name_role_term.value", "name-1:name_role-1:name_role_term.uri", HyacinthExport::UriMapping::ROLES_MAP)
         csv.value_to_uri("name-1:name_role-2:name_role_term.value", "name-1:name_role-2:name_role_term.uri", HyacinthExport::UriMapping::ROLES_MAP)
 
+        csv.map_subjects_to_fast
+
         # Create Hyacinth compatible csv.
         csv.export_to_file
       end

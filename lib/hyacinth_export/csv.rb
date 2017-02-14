@@ -30,9 +30,12 @@ module HyacinthExport
       end
     end
 
-    def add_column(name, default_content: nil)
+    def add_column(*names, default_content: nil)
+      names = [names] if names.is_a?(String)
       self.table.each do |row|
-        row[name] = default_content
+        names.each do |name|
+          row[name] = default_content
+        end
       end
     end
 
@@ -104,6 +107,82 @@ module HyacinthExport
         if (last_name = row[last_name_column]) && (first_name = row[first_name_column])
           row[last_name_column] = "#{last_name}, #{first_name}"
         end
+      end
+    end
+
+    # Maps subjects that don't have URIs and are valid ProQuest subjects to Fast
+    # Subjects. One subject can map to 0+ fast topics and 0+ fast geographic topics.
+    def map_subjects_to_fast
+      proquest_fast_map = HashWithIndifferentAccess.new(YAML.load_file("#{Rails.root}/lib/hyacinth_export/proquest_fast_map.yml"))
+
+      self.table.each do |row|
+        new_topics, new_geographic_topics = [], []
+        subject_headers = headers.select { |h| /subject_topic-(\d+):subject_topic_term.value/.match(h) }
+        subject_headers.each do |sub_header|
+          uri_column = sub_header.gsub('value', 'uri')
+          unless headers.include?(uri_column)
+            add_column(uri_column)
+          end
+
+          next if row[sub_header].blank? || !row[uri_column].blank?
+
+          subject = row[sub_header]
+          fast_mapping = proquest_fast_map[subject.downcase]
+          unless fast_mapping
+            puts "No fast mapping for \"#{subject}\""
+            next
+          end
+
+          row[sub_header] = nil
+          row[uri_column] = nil
+
+          new_topics.concat(fast_mapping[:topic] || [])
+          new_geographic_topics.concat(fast_mapping[:geographic] || [])
+        end
+
+        # Get all empty geographic headers and make new columns if necessary
+        geographic_headers = headers.select { |h| /subject_geographic-(\d+):subject_geographic_term.value/.match(h) }
+        empty = geographic_headers.select { |h| row[h].blank? and row[h.gsub('value', 'uri')].blank? }
+        if new_geographic_topics.size > empty.size # make new rows
+          num = new_geographic_topics.size - empty.size
+          (1..num).each do |i|
+            new_header = "subject_geographic-#{geographic_headers.size + i}:subject_geographic_term.value"
+            new_uri_header = new_header.gsub('value', 'uri')
+            add_column(new_header, new_uri_header)
+            empty << new_header
+          end
+        end
+
+        add_topics(row, new_geographic_topics, empty)
+
+        # Get all empty subject_headers and make new columns if necessary.
+        # Add in new topics
+        empty = subject_headers.select { |h| row[h].blank? and row[h.gsub('value', 'uri')].blank? }
+        if new_topics.size > empty.size # make new rows
+          num = new_topics.size - empty.size
+          (1..num).each do |i|
+            new_header = "subject_topic-#{subject_header.size + i}:subject_topic_term.value"
+            new_uri_header = new_header.gsub('value', 'uri')
+            add_column(new_header, new_uri_header)
+            empty << new_header
+          end
+        end
+
+        add_topics(row, new_topics, empty)
+      end
+    end
+
+    private
+
+    # Adds topic label and topic uri in the empty columns given.
+    def add_topics(row, new_topics, empty_columns)
+      empty_columns.sort_by!{ |s| s[/\d+/].to_i }.reverse!
+
+      new_topics.each do |topic|
+        column = empty_columns.pop
+        raise 'not enough empty columns' if column.nil?
+        row[column] = topic[:label]
+        row[column.gsub('value', 'uri')] = topic[:uri]
       end
     end
   end

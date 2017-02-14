@@ -67,6 +67,6 @@ namespace :hyacinth do
       puts "pass item_type_code=code [filename=filename]"
     end
 
-    HyacinthExport::MapHeaders.send("from_#{code.downcase}", filename, filename.gsub('export-from-hypatia', 'import-to-hyacinth'))
+    HyacinthExport::MapHeaders.send("from_#{code.downcase}", filename, filename.gsub('export-from-hypatia', 'hyacinth_import_for_review'))
   end
 end

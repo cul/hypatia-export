@@ -80,14 +80,34 @@ module HyacinthExport
 
     def export_to_file
       ::CSV.open(self.import_filepath, 'w', encoding: 'UTF-8') do |csv|
-        self.table.to_a.each { |row| csv.add_row(row) }
+        # Sorting header by alphabetical order. If begining of header is the same
+        # headers are stored by number.
+        sorted_headers = headers.sort do |a, b|
+          regex = /^(.*)-(\d*):(.*)/
+          a_match = regex.match(a)
+          b_match = regex.match(b)
+          if !a_match.nil? && !b_match.nil? && (a_match[1] == b_match[1])
+            if a_match[2].to_i == b_match[2].to_i
+              a_match[3] <=> b_match[3]
+            else
+              a_match[2].to_i <=> b_match[2].to_i
+            end
+          else
+            a <=> b
+          end
+        end
+
+        csv.add_row(sorted_headers)
+        self.table.each do |row|
+          csv.add_row(row.fields(*sorted_headers))
+        end
       end
     end
 
     def normalize_doi(column_name)
       self.table.each do |row|
         doi = row[column_name]
-        if m = /http\:\/\/dx.doi.org\/(.+)/.match(doi)
+        if m = /http\:\/\/dx\.doi\.org\/(.+)/.match(doi)
           row[column_name] = m[1]
         end
       end

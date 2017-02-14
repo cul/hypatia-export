@@ -6,6 +6,7 @@ module HyacinthExport
       'article' => 'http://vocab.getty.edu/aat/300048715',
       'blog posts' => 'http://vocab.getty.edu/aat/300026291',
       'books' => 'http://vocab.getty.edu/aat/300060417',
+      'book' => 'http://vocab.getty.edu/aat/300060417',
       'book chapters' => 'http://vocab.getty.edu/aat/300311699',
       'charts' => 'http://vocab.getty.edu/aat/300026848',
       'computer software' => 'http://vocab.getty.edu/aat/300028566',

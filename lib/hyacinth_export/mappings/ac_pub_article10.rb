@@ -87,7 +87,7 @@ module HyacinthExport::Mappings
 
         csv.headers.each do |header|
           no_prefix_header = header.gsub("#{PREFIX}:", '')
-          if m = /#{PREFIX}:subjectTopicKeyword-?(\d*)/.match(header)
+          if m = /^#{PREFIX}:subjectTopicKeyword-?(\d*)$/.match(header)
             csv.rename_column(header, "subject_topic-#{m[1].to_i + 1}:subject_topic_term.value")
           elsif MAP[no_prefix_header] # mapping one-to-one fields
             csv.rename_column(header, MAP[no_prefix_header])

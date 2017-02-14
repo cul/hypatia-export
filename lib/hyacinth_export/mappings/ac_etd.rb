@@ -85,34 +85,32 @@ module HyacinthExport::Mappings
         end
 
         # Mapping rest of columns
-        columns_to_add = []
         num_fast = csv.headers.select{ |h| /#{PREFIX}:FAST-?(\d+)?:FASTURI/.match(h) }.count
         csv.headers.each do |header|
           no_prefix_header = header.gsub("#{PREFIX}:", '')
 
-          if m = /#{PREFIX}:FAST-?(\d*):FASTURI/.match(header)
+          if m = /^FAST-?(\d*):FASTURI$/.match(no_prefix_header)
             csv.rename_column(header, "subject_topic-#{m[1].to_i+1}:subject_topic_term.uri")
-          elsif m = /#{PREFIX}:FAST-?(\d*):FASTSubject/.match(header)
+          elsif m = /^FAST-?(\d*):FASTSubject$/.match(no_prefix_header)
             csv.rename_column(header, "subject_topic-#{m[1].to_i+1}:subject_topic_term.value")
-          elsif m = /#{PREFIX}:subject-?(\d*)/.match(header)
+          elsif m = /^subject-?(\d*)$/.match(no_prefix_header)
             num = m[1].to_i + 1 + num_fast
             csv.rename_column(header, "subject_topic-#{num}:subject_topic_term.value")
-            columns_to_add.append("subject_topic-#{num}:subject_topic_term.uri")
-          elsif m = /#{PREFIX}:FASTGeo-?(\d*):GeoURI/.match(header)
+          elsif m = /^FASTGeo-?(\d*):GeoURI$/.match(no_prefix_header)
             csv.rename_column(header, "subject_geographic-#{m[1].to_i + 1}:subject_geographic_term.uri")
-          elsif m = /#{PREFIX}:FASTGeo-?(\d*):Geo/.match(header)
+          elsif m = /^FASTGeo-?(\d*):Geo$/.match(no_prefix_header)
             csv.rename_column(header, "subject_geographic-#{m[1].to_i + 1}:subject_geographic_term.value")
           elsif MAP[no_prefix_header] # mapping one-to-one fields
             csv.rename_column(header, MAP[no_prefix_header])
           end
         end
 
-        columns_to_add.each { |c| csv.add_column(c) }
-
         # Degree and URI Mappings
         csv.value_to_uri('degree-1:degree_name', 'degree-1:degree_level', DEGREE_TO_NUM, case_sensitive: true)
         csv.value_to_uri('genre-1:genre_term.value', 'genre-1:genre_term.uri', HyacinthExport::UriMapping::GENRE_MAP)
         csv.value_to_uri('language-1:language_term.value', 'language-1:language_term.uri', HyacinthExport::UriMapping::LANGUAGE_MAP)
+
+        csv.map_subjects_to_fast
 
         csv.export_to_file
       end

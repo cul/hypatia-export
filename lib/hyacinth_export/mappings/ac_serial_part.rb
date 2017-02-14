@@ -79,22 +79,20 @@ module HyacinthExport::Mappings
         # end
 
         # Mapping rest of columns.
-        columns_to_add = []
         num_fast = csv.headers.select{ |h| /#{PREFIX}:FAST-?(\d+)?:FASTURI/.match(h) }.count
         csv.headers.each do |header|
           no_prefix_header = header.gsub("#{PREFIX}:", '')
 
-          new_name = if m = /#{PREFIX}:FAST-?(\d*):FASTURI/.match(header)
+          new_name = if m = /^FAST-?(\d*):FASTURI$/.match(no_prefix_header)
                       "subject_topic-#{m[1].to_i+1}:subject_topic_term.uri"
-                     elsif m = /#{PREFIX}:FAST-?(\d*):FASTSubject/.match(header)
+                    elsif m = /^FAST-?(\d*):FASTSubject$/.match(no_prefix_header)
                        "subject_topic-#{m[1].to_i+1}:subject_topic_term.value"
-                     elsif m = /#{PREFIX}:subject-?(\d*)/.match(header)
+                     elsif m = /^subject-?(\d*)$/.match(no_prefix_header)
                        num = m[1].to_i + 1 + num_fast
-                       columns_to_add.append("subject_topic-#{num}:subject_topic_term.uri")
                        "subject_topic-#{num}:subject_topic_term.value"
-                     elsif m = /#{PREFIX}:FASTGeo-?(\d*):GeoURI/.match(header)
+                     elsif m = /^FASTGeo-?(\d*):GeoURI$/.match(no_prefix_header)
                        "subject_geographic-#{m[1].to_i + 1}:subject_geographic_term.uri"
-                     elsif m = /#{PREFIX}:FASTGeo-?(\d*):Geo/.match(header)
+                     elsif m = /^FASTGeo-?(\d*):Geo$/.match(no_prefix_header)
                        "subject_geographic-#{m[1].to_i + 1}:subject_geographic_term.value"
                      elsif MAP[no_prefix_header] # mapping one-to-one fields
                        MAP[no_prefix_header]
@@ -104,7 +102,7 @@ module HyacinthExport::Mappings
           csv.rename_column(header, new_name) unless new_name.nil?
         end
 
-        columns_to_add.each { |c| csv.add_column(c) }
+        csv.map_subjects_to_fast
 
         csv.export_to_file
       end

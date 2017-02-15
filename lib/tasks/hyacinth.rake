@@ -41,7 +41,7 @@ namespace :hyacinth do
     end
 
     # Remove items that should be ignored.
-    do_not_export_filepath = File.expand_path(File.join('~', 'Google Drive', 'Hypatia Export CSVs', 'do_not_export.csv'))
+    do_not_export_filepath = File.expand_path(File.join('~', 'Google Drive', 'AC4', 'Hypatia to Hyacinth Migration', 'Export CSVs', 'do_not_export.csv'))
     ignore = ::CSV.read(do_not_export_filepath).drop(1).map(&:first).map(&:to_i)
     items = items.reject { |i| ignore.include?(i.id) }
 

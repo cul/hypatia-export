@@ -136,7 +136,7 @@ module HyacinthExport
       proquest_fast_map = HashWithIndifferentAccess.new(YAML.load_file("#{Rails.root}/lib/hyacinth_export/proquest_fast_map.yml"))
 
       self.table.each do |row|
-        new_topics, new_geographic_topics = [], []
+        topics, geographic_topics = [], []
         subject_headers = headers.select { |h| /subject_topic-(\d+):subject_topic_term.value/.match(h) }
         subject_headers.each do |sub_header|
           uri_column = sub_header.gsub('value', 'uri')
@@ -144,27 +144,30 @@ module HyacinthExport
             add_column(uri_column)
           end
 
-          next if row[sub_header].blank? || !row[uri_column].blank?
-
           subject = row[sub_header]
-          fast_mapping = proquest_fast_map[subject.downcase]
-          unless fast_mapping
-            puts "No fast mapping for \"#{subject}\""
+          uri = row[uri_column]
+
+          if subject.blank? && row[uri_column].blank?
             next
+          elsif !row[uri_column].blank?
+            topics.append({ label: subject, uri: uri })
+          elsif fast_mapping = proquest_fast_map[subject.downcase]
+            topics.concat(fast_mapping[:topic] || [])
+            geographic_topics.concat(fast_mapping[:geographic] || [])
+          else
+            topics.append({ label: subject, uri: uri })
+            puts "No fast mapping for \"#{subject}\""
           end
 
           row[sub_header] = nil
           row[uri_column] = nil
-
-          new_topics.concat(fast_mapping[:topic] || [])
-          new_geographic_topics.concat(fast_mapping[:geographic] || [])
         end
 
         # Get all empty geographic headers and make new columns if necessary
         geographic_headers = headers.select { |h| /subject_geographic-(\d+):subject_geographic_term.value/.match(h) }
         empty = geographic_headers.select { |h| row[h].blank? and row[h.gsub('value', 'uri')].blank? }
-        if new_geographic_topics.size > empty.size # make new rows
-          num = new_geographic_topics.size - empty.size
+        if geographic_topics.size > empty.size # make new rows
+          num = geographic_topics.size - empty.size
           (1..num).each do |i|
             new_header = "subject_geographic-#{geographic_headers.size + i}:subject_geographic_term.value"
             new_uri_header = new_header.gsub('value', 'uri')
@@ -173,13 +176,13 @@ module HyacinthExport
           end
         end
 
-        add_topics(row, new_geographic_topics, empty)
+        add_topics(row, geographic_topics, empty)
 
         # Get all empty subject_headers and make new columns if necessary.
         # Add in new topics
         empty = subject_headers.select { |h| row[h].blank? and row[h.gsub('value', 'uri')].blank? }
-        if new_topics.size > empty.size # make new rows
-          num = new_topics.size - empty.size
+        if topics.size > empty.size # make new rows
+          num = topics.size - empty.size
           (1..num).each do |i|
             new_header = "subject_topic-#{subject_header.size + i}:subject_topic_term.value"
             new_uri_header = new_header.gsub('value', 'uri')
@@ -188,11 +191,27 @@ module HyacinthExport
           end
         end
 
-        add_topics(row, new_topics, empty)
+        add_topics(row, topics, empty)
+      end
+
+      # Remove empty subject_headers columns
+      subject_headers = headers.select { |h| /subject_topic-(\d+):subject_topic_term.value/.match(h) }
+      subject_headers.each do |s|
+        uri = s.gsub('value', 'uri')
+        if column_empty?(s) && column_empty?(uri)
+          delete_columns([s, uri], with_prefix: true)
+        end
       end
     end
 
     private
+
+    def column_empty?(name)
+      self.table.each do |row|
+        return false unless row[name].blank?
+      end
+      true
+    end
 
     # Adds topic label and topic uri in the empty columns given.
     def add_topics(row, new_topics, empty_columns)

@@ -114,18 +114,19 @@ module HyacinthExport
     end
 
     def add_name_type(num:, type:)
-       add_column("name-#{num}:name_term.name_type")
-       self.table.each do |row|
-         unless row["name-#{num}:name_term.value"].blank?
-           row["name-#{num}:name_term.name_type"] = type
-         end
+      add_column("name-#{num}:name_term.name_type")
+      self.table.each do |row|
+       unless row["name-#{num}:name_term.value"].blank?
+         row["name-#{num}:name_term.name_type"] = type
        end
+      end
     end
 
     def combine_name(first_name_column, last_name_column)
       self.table.each do |row|
-        if (last_name = row[last_name_column]) && (first_name = row[first_name_column])
-          row[last_name_column] = "#{last_name}, #{first_name}"
+        last_name, first_name = row[last_name_column], row[first_name_column]
+        unless last_name.blank? && first_name.blank?
+          row[last_name_column] = [last_name, first_name].join(', ')
         end
       end
     end

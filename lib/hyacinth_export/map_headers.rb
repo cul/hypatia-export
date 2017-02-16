@@ -5,6 +5,7 @@ require 'hyacinth_export/mappings/ac_serial_part'
 require 'hyacinth_export/mappings/ac_type_book10'
 require 'hyacinth_export/mappings/ac_type_book_chapter10'
 require 'hyacinth_export/mappings/ac_wp10'
+require 'hyacinth_export/mappings/ac_type_av'
 
 module HyacinthExport
   class MapHeaders
@@ -14,5 +15,6 @@ module HyacinthExport
     include HyacinthExport::Mappings::AcTypeBook10
     include HyacinthExport::Mappings::AcTypeBookChapter10
     include HyacinthExport::Mappings::AcWp10
+    include HyacinthExport::Mappings::AcTypeAv
   end
 end

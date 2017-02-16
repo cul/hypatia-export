@@ -83,11 +83,11 @@ module HyacinthExport
         # Sorting header by alphabetical order. If begining of header is the same
         # headers are stored by number.
         sorted_headers = headers.sort do |a, b|
-          regex = /^(.*)-(\d*):(.*)/
+          regex = /^(\w+)-(\d+):(.*)$/
           a_match = regex.match(a)
           b_match = regex.match(b)
-          if !a_match.nil? && !b_match.nil? && (a_match[1] == b_match[1])
-            if a_match[2].to_i == b_match[2].to_i
+          if a_match && b_match && (a_match[1] == b_match[1])
+            if a_match[2] == b_match[2]
               a_match[3] <=> b_match[3]
             else
               a_match[2].to_i <=> b_match[2].to_i
@@ -162,6 +162,10 @@ module HyacinthExport
           row[sub_header] = nil
           row[uri_column] = nil
         end
+
+        # Removing duplicates
+        topics.uniq! { |t| t[:uri] || t[:label]}
+        geographic_topics.uniq! { |t| t[:uri] || t[:label]}
 
         # Get all empty geographic headers and make new columns if necessary
         geographic_headers = headers.select { |h| /subject_geographic-(\d+):subject_geographic_term.value/.match(h) }

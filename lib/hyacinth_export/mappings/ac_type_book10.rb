@@ -68,7 +68,7 @@ module HyacinthExport::Mappings
             'affilDept', 'affilDept-1', 'affilDept-2', 'affilDept-3', 'namePartGiven', 'affilDept', 'namePartDate',
             'affilAffiliation:affilAuIDLocal', 'affilAffiliation:affilEmail', 'affilAffiliation:originCountry',
             'affilAffiliation:affilOrganization', 'affilAffiliation:affilDept', 'affilAffiliation:affilDeptOther',
-            'affilAffiliation:affilDeptOther-1', 'affilAffiliation:affilAuIDNAF'
+            'affilAffiliation:affilDeptOther-1', 'affilAffiliation:affilAuIDNAF', 'affilAffiliation:affilDeptOther-2'
           ].map { |a| "#{name[1]}:#{a}" }
           csv.delete_columns(to_delete)
         end

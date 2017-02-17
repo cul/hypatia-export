@@ -33,6 +33,7 @@ module HyacinthExport
       'reports' => 'http://vocab.getty.edu/aat/300027267',
       'reviews' => 'http://id.loc.gov/authorities/genreForms/gf2014026168',
       'scripts' => 'http://vocab.getty.edu/aat/300055918',
+      'short stories' => 'http://vocab.getty.edu/aat/300055918',
       'technical reports' => 'http://vocab.getty.edu/aat/300027267',
       'technical report' => 'http://vocab.getty.edu/aat/300027267',
       'undergraduate theses' => 'http://vocab.getty.edu/aat/300028028',

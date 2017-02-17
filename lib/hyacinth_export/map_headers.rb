@@ -1,11 +1,4 @@
-require 'hyacinth_export/csv'
-require 'hyacinth_export/mappings/ac_pub_article10'
-require 'hyacinth_export/mappings/ac_etd'
-require 'hyacinth_export/mappings/ac_serial_part'
-require 'hyacinth_export/mappings/ac_type_book10'
-require 'hyacinth_export/mappings/ac_type_book_chapter10'
-require 'hyacinth_export/mappings/ac_wp10'
-require 'hyacinth_export/mappings/ac_type_av'
+Dir["#{Rails.root}/lib/hyacinth_export/mappings/*.rb"].each { |file| require file }
 
 module HyacinthExport
   class MapHeaders
@@ -16,5 +9,6 @@ module HyacinthExport
     include HyacinthExport::Mappings::AcTypeBookChapter10
     include HyacinthExport::Mappings::AcWp10
     include HyacinthExport::Mappings::AcTypeAv
+    include HyacinthExport::Mappings::AcTypeUnpubItem10
   end
 end

@@ -47,6 +47,7 @@ module HyacinthExport
       # delete old row
     end
 
+    # Merges columns if they have the same data, otherwise throws an error.
     def merge_columns(from, to)
       from = "#{prefix}:#{from}"
       to = "#{prefix}:#{to}"
@@ -60,6 +61,14 @@ module HyacinthExport
 
       # from column is deleted, to column is saved
       delete_columns([from], with_prefix: true)
+    end
+
+    # Joins columns. Keeps first column deletes rest of columns.
+    def append_columns(*columns, seperator: ' ')
+      self.table.each do |row|
+        row[columns.first] = columns.map { |c| row[c] }.delete_if(&:blank?).join(seperator)
+      end
+      delete_columns(columns.drop(1), with_prefix: true)
     end
 
     def value_to_uri(value_column, uri_column_name, map, case_sensitive: false)

@@ -17,9 +17,10 @@ module HyacinthExport::Mappings
         'originDateIssued'     => 'date_issued-1:date_issued_start_value',
         'originPlaceText'      => 'place_of_origin-1:place_of_origin_value',
         'originPublisher'      => 'publisher-1:publisher_value',
-        # 'relatedItemSeries:title' => 'series-1:series_number'
-        'tiInfoTitle'                        => 'title-1:title_sort_portion',
-        'typeResc'                           => 'type_of_resource-1:type_of_resource_value',
+        'tiInfoTitle'          => 'title-1:title_sort_portion',
+        'typeResc'             => 'type_of_resource-1:type_of_resource_value',
+        'relatedItemSeries:partNumber' => 'series-1:series_number',
+        'relatedItemSeries:title'      => 'series-1:series_title'
       }
 
       def from_actypeav(export_filepath, import_filepath)
@@ -54,7 +55,6 @@ module HyacinthExport::Mappings
           csv.rename_column(name.string, "name-#{num}:name_term.value")
           csv.add_name_type(num: num, type: 'corporate')
         end
-
 
         # Map personal names
         name_matches = csv.headers.map{ |h| /#{PREFIX}:(nameAffil-?(\d*)):namePartFamily/.match(h) }.compact

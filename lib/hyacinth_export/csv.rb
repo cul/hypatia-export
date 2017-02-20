@@ -199,7 +199,7 @@ module HyacinthExport
         if topics.size > empty.size # make new rows
           num = topics.size - empty.size
           (1..num).each do |i|
-            new_header = "subject_topic-#{subject_header.size + i}:subject_topic_term.value"
+            new_header = "subject_topic-#{subject_headers.size + i}:subject_topic_term.value"
             new_uri_header = new_header.gsub('value', 'uri')
             add_column(new_header, new_uri_header)
             empty << new_header

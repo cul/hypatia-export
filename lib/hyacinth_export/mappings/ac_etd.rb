@@ -30,8 +30,8 @@ module HyacinthExport::Mappings
       }
 
       # Map CSV headers from acETD Hypatia csv to Hyacinth compatible csv
-      def from_acetd(filename)
-        csv = HyacinthExport::CSV.new(filename, prefix: PREFIX)
+      def from_acetd(export_filepath, import_filepath)
+        csv = HyacinthExport::CSV.new(export_filepath, import_filepath, prefix: PREFIX)
 
         csv.delete_columns(%w{
           _hypatia_id copyright:copyrightNotice copyright:creativeCommonsLicense tableOfContents

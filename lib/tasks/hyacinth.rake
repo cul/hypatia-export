@@ -61,7 +61,8 @@ namespace :hyacinth do
   task :create_hyacinth_csv => :environment do
     if ENV['item_type_code']
       code = ENV['item_type_code']
-      filename = ENV['filename'] || File.join(Rails.root, 'tmp', 'data', "#{code}-export-from-hypatia.csv")
+      filename = ENV['filename'] || "#{code}-export-from-hypatia.csv"
+      filename = File.join(Rails.root, 'tmp', 'data', filename)
       # Raise error if filename does not contain 'export-from-hypatia'
     else
       puts "pass item_type_code=code [filename=filename]"

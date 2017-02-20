@@ -44,7 +44,7 @@ module HyacinthExport::Mappings
           relatedBkChptrHost:originEdition subjectGeoCode
         })
 
-        # Map parent publication. One parent publication per record, can have multiple authors.
+        # Map parent publication authors. One parent publication per record, can have multiple authors.
         parent_pub_authors = csv.headers.map { |h| /#{PREFIX}:(relatedBkChptrHost:acNamePersonalShort-?(\d*)):namePartFamily/.match(h) }.compact
         parent_pub_authors.each do |name|
           csv.combine_name("#{PREFIX}:#{name[1]}:namePartGiven", "#{PREFIX}:#{name[1]}:namePartFamily")

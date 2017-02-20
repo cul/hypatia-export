@@ -10,5 +10,6 @@ module HyacinthExport
     include HyacinthExport::Mappings::AcWp10
     include HyacinthExport::Mappings::AcTypeAv
     include HyacinthExport::Mappings::AcTypeUnpubItem10
+    include HyacinthExport::Mappings::AcTypeBookChapter
   end
 end

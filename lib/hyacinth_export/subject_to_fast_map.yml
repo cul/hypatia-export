@@ -1763,3 +1763,59 @@ individual and family studies:
   topic:
   - label: Families
     uri: http://id.worldcat.org/fast/1728849
+educational tests and measurements:
+  topic:
+  - label: Educational tests and measurements
+    uri: http://id.worldcat.org/fast/903660
+sub-saharan africa studies:
+  geographic:
+  - label: Africa, Sub-Saharan
+    uri: http://id.worldcat.org/fast/1239520
+  topic:
+  - label: Africans
+    uri: http://id.worldcat.org/fast/799938
+americn history:
+  geographic:
+  - label: United States
+    uri: http://id.worldcat.org/fast/1204155
+  topic:
+  - label: History
+    uri: http://id.worldcat.org/fast/958235
+evolution and development:
+  topic:
+  - label: Evolution (Biology)
+    uri: http://id.worldcat.org/fast/917302
+womens studies:
+  topic:
+  - label: Women's studies
+    uri: http://id.worldcat.org/fast/1178850
+urban studies:
+  topic:
+  - label: Cities and towns--Study and teaching
+    uri: http://id.worldcat.org/fast/861853
+foreign language education:
+  topic:
+  - label: Language and languages--Study and teaching
+    uri: http://id.worldcat.org/fast/992220
+science history:
+  topic:
+  - label: Science
+    uri: http://id.worldcat.org/fast/1108176
+  - label: History
+    uri: http://id.worldcat.org/fast/958235
+business administration:
+  topic:
+  - label: Industrial management
+    uri: http://id.worldcat.org/fast/971246
+educational philosophy:
+  topic:
+  - label: Education--Philosophy
+    uri: http://id.worldcat.org/fast/902721
+medical imaging:
+  topic:
+  - label: Diagnostic imaging
+    uri: http://id.worldcat.org/fast/892354
+labor economics:
+  topic:
+  - label: Labor economics
+    uri: http://id.worldcat.org/fast/989943

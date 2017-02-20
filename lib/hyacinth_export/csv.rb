@@ -53,8 +53,8 @@ module HyacinthExport
       to = "#{prefix}:#{to}"
       self.table.each do |row|
         # throw an error is both columns have a value and the value is not the same
-        if !row[from].blank? && !row[to].blank? && row[to] != row[from]
-          raise "Cannot merge #{from} and #{to}. Please merge manually."
+        if !row[from].blank? && !row[to].blank? && row[to].strip != row[from].strip
+          raise "Cannot merge #{from} and #{to} for the values #{row[from]} - #{row[to]}. Please merge manually."
         end
         row[to] = row[from] || row[to]
       end
@@ -155,6 +155,7 @@ module HyacinthExport
           end
 
           subject = row[sub_header]
+          subject = subject.strip unless subject.nil?
           uri = row[uri_column]
 
           if subject.blank? && row[uri_column].blank?

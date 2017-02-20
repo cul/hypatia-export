@@ -1747,3 +1747,19 @@ zoology:
   topic:
   - label: Zoology
     uri: http://id.worldcat.org/fast/1184696
+english language and literature:
+  topic:
+  - label: English literature
+    uri: http://id.worldcat.org/fast/911989
+library and information science:
+  topic:
+  - label: Library science
+    uri: http://id.worldcat.org/fast/997916
+science in human affairs:
+  topic:
+  - label: Science--Social aspects
+    uri: http://id.worldcat.org/fast/1108360
+individual and family studies:
+  topic:
+  - label: Families
+    uri: http://id.worldcat.org/fast/1728849

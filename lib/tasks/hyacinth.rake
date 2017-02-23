@@ -70,4 +70,15 @@ namespace :hyacinth do
 
     HyacinthExport::MapHeaders.send("from_#{code.downcase}", filename, filename.gsub('export-from-hypatia', 'hyacinth-import-for-review'))
   end
+
+  task :create_all_hyacinth_csv => :environment do
+    directory = File.join(Rails.root, 'tmp', 'data')
+
+    # acEDT
+    (1..9).each do |num|
+      filename = File.join(directory, "acETD-#{num}-export-from-hypatia.csv")
+      HyacinthExport::MapHeaders.from_acetd(filename, filename.gsub('export-from-hypatia', 'hyacinth-import-for-review'))
+    end
+
+  end
 end

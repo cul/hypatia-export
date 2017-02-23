@@ -19,6 +19,7 @@ module HyacinthExport
       'images' => 'http://vocab.getty.edu/aat/300054154',
       'interviews and roundtables' => 'http://vocab.getty.edu/aat/300026392',
       'journals' => 'http://vocab.getty.edu/aat/300048715',
+      'journal article' => 'http://vocab.getty.edu/aat/300048715',
       'letters' => 'http://vocab.getty.edu/aat/300026291',
       'master\'s theses' => 'http://vocab.getty.edu/aat/300028028',
       'moving images' => 'http://vocab.getty.edu/aat/300249172',

@@ -27,8 +27,8 @@ module HyacinthExport::Mappings
         'relatedItemHost:partExtentPageStart' => 'parent_publication-1:parent_publication_page_start',
       }
 
-      def from_acserialpart(filename)
-        csv = HyacinthExport::CSV.new(filename, prefix: PREFIX)
+      def from_acserialpart(export_filepath, import_filepath)
+        csv = HyacinthExport::CSV.new(export_filepath, import_filepath, prefix: PREFIX)
 
         csv.delete_columns(%w{
           tableOfContents
@@ -60,23 +60,22 @@ module HyacinthExport::Mappings
           csv.delete_columns(delete)
         end
 
-
-
         # Map corporate names
-        # corporate_matches = csv.headers.map { |h| /#{PREFIX}:(nameCorporate-?(\d*)):namePart/.match(h) }.compact
-        # corporate_matches.each do |name|
-        #   num = name_matches.count + name[2].to_i + 1
-        #
-        #   role_match = csv.headers.map { |h| /#{PREFIX}:#{name[1]}:role-?(\d*)/.match(h) }.compact
-        #   role_match.each do |role|
-        #     new_column = "name-#{num}:name_role-#{role[1].to_i + 1}:name_role_term.value"
-        #     csv.rename_column(role.string, "name-#{num}:name_role-#{role[1].to_i + 1}:name_role_term.value")
-        #     csv.value_to_uri(new_column, new_column.gsub('.value', '.uri'), HyacinthExport::UriMapping::ROLES_MAP)
-        #   end
-        #
-        #   csv.rename_column(name.string, "name-#{num}:name_term.value")
-        #   csv.add_name_type(num: num, type: 'corporate')
-        # end
+        corporate_matches = csv.headers.map { |h| /^#{PREFIX}:(nameCorporate-?(\d*)):namePart$/.match(h) }.compact
+        corporate_matches.each do |name|
+          num = name_matches.count + name[2].to_i + 1
+
+          role_match = csv.headers.map { |h| /^#{PREFIX}:#{name[1]}:role-?(\d*)$/.match(h) }.compact
+          role_match.each do |role|
+            new_column = "name-#{num}:name_role-#{role[1].to_i + 1}:name_role_term.value"
+            csv.rename_column(role.string, "name-#{num}:name_role-#{role[1].to_i + 1}:name_role_term.value")
+            csv.value_to_uri(new_column, new_column.gsub('.value', '.uri'), HyacinthExport::UriMapping::ROLES_MAP)
+          end
+
+          csv.merge_columns("#{PREFIX}:#{name[1]}:namePartSelect", name.string)
+          csv.rename_column(name.string, "name-#{num}:name_term.value")
+          csv.add_name_type(num: num, type: 'corporate')
+        end
 
         # Mapping rest of columns.
         num_fast = csv.headers.select{ |h| /#{PREFIX}:FAST-?(\d+)?:FASTURI/.match(h) }.count
@@ -101,6 +100,10 @@ module HyacinthExport::Mappings
                      end
           csv.rename_column(header, new_name) unless new_name.nil?
         end
+
+        # URI Mappings
+        csv.value_to_uri('genre-1:genre_term.value', 'genre-1:genre_term.uri', HyacinthExport::UriMapping::GENRE_MAP)
+        csv.value_to_uri('language-1:language_term.value', 'language-1:language_term.uri', HyacinthExport::UriMapping::LANGUAGE_MAP)
 
         csv.map_subjects_to_fast
 

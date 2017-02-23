@@ -1819,3 +1819,23 @@ labor economics:
   topic:
   - label: Labor economics
     uri: http://id.worldcat.org/fast/989943
+anthropology:
+  topic:
+  - label: Anthropology
+    uri: http://id.worldcat.org/fast/810196
+behavioral psychology:
+  topic:
+  - label: Psychology
+    uri: http://id.worldcat.org/fast/1081447
+transporation planning:
+  topic:
+  - label: Transportation--Planning
+    uri: http://id.worldcat.org/fast/1155146
+oceanography:
+  topic:
+  - label: Oceanography
+    uri: http://id.worldcat.org/fast/1043671
+biomedical informatics:
+  topic:
+  - label: Bioinformatics
+    uri: http://id.worldcat.org/fast/832181

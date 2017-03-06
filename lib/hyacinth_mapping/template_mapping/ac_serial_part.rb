@@ -1,4 +1,4 @@
-module HyacinthExport::Mappings
+module HyacinthMapping::TemplateMapping
   module AcSerialPart
     def self.included(base)
       base.extend ClassMethods
@@ -28,7 +28,7 @@ module HyacinthExport::Mappings
       }
 
       def from_acserialpart(export_filepath, import_filepath)
-        csv = HyacinthExport::CSV.new(export_filepath, import_filepath, prefix: PREFIX)
+        csv = HyacinthMapping::CSV.new(export_filepath, import_filepath, prefix: PREFIX)
 
         csv.delete_columns(%w{
           tableOfContents
@@ -46,7 +46,7 @@ module HyacinthExport::Mappings
           role_match.each do |role|
             new_column = "name-#{num}:name_role-#{role[1].to_i + 1}:name_role_term.value"
             csv.rename_column(role.string, "name-#{num}:name_role-#{role[1].to_i + 1}:name_role_term.value")
-            csv.value_to_uri(new_column, new_column.gsub('.value', '.uri'), HyacinthExport::UriMapping::ROLES_MAP)
+            csv.value_to_uri(new_column, new_column.gsub('.value', '.uri'), HyacinthMapping::UriMapping::ROLES_MAP)
           end
 
           # Rename rest of columns
@@ -69,7 +69,7 @@ module HyacinthExport::Mappings
           role_match.each do |role|
             new_column = "name-#{num}:name_role-#{role[1].to_i + 1}:name_role_term.value"
             csv.rename_column(role.string, "name-#{num}:name_role-#{role[1].to_i + 1}:name_role_term.value")
-            csv.value_to_uri(new_column, new_column.gsub('.value', '.uri'), HyacinthExport::UriMapping::ROLES_MAP)
+            csv.value_to_uri(new_column, new_column.gsub('.value', '.uri'), HyacinthMapping::UriMapping::ROLES_MAP)
           end
 
           csv.merge_columns("#{PREFIX}:#{name[1]}:namePartSelect", name.string)
@@ -102,8 +102,8 @@ module HyacinthExport::Mappings
         end
 
         # URI Mappings
-        csv.value_to_uri('genre-1:genre_term.value', 'genre-1:genre_term.uri', HyacinthExport::UriMapping::GENRE_MAP)
-        csv.value_to_uri('language-1:language_term.value', 'language-1:language_term.uri', HyacinthExport::UriMapping::LANGUAGE_MAP)
+        csv.value_to_uri('genre-1:genre_term.value', 'genre-1:genre_term.uri', HyacinthMapping::UriMapping::GENRE_MAP)
+        csv.value_to_uri('language-1:language_term.value', 'language-1:language_term.uri', HyacinthMapping::UriMapping::LANGUAGE_MAP)
 
         csv.map_subjects_to_fast
 

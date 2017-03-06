@@ -1,5 +1,6 @@
-module HyacinthExport::Mappings
-  module AcEtd
+module HyacinthMapping
+  module TemplateMapping
+    module AcEtd
     def self.included(base)
       base.extend ClassMethods
     end
@@ -31,7 +32,7 @@ module HyacinthExport::Mappings
 
       # Map CSV headers from acETD Hypatia csv to Hyacinth compatible csv
       def from_acetd(export_filepath, import_filepath)
-        csv = HyacinthExport::CSV.new(export_filepath, import_filepath, prefix: PREFIX)
+        csv = HyacinthMapping::CSV.new(export_filepath, import_filepath, prefix: PREFIX)
 
         csv.delete_columns(%w{
           _hypatia_id copyright:copyrightNotice copyright:creativeCommonsLicense tableOfContents
@@ -54,7 +55,7 @@ module HyacinthExport::Mappings
           role_match.each do |role|
             new_column = "name-#{num}:name_role-#{role[1].to_i + 1}:name_role_term.value"
             csv.rename_column(role.string, "name-#{num}:name_role-#{role[1].to_i + 1}:name_role_term.value")
-            csv.value_to_uri(new_column, new_column.gsub('.value', '.uri'), HyacinthExport::UriMapping::ROLES_MAP)
+            csv.value_to_uri(new_column, new_column.gsub('.value', '.uri'), HyacinthMapping::UriMapping::ROLES_MAP)
           end
 
           # Rename rest of columns
@@ -77,7 +78,7 @@ module HyacinthExport::Mappings
           role_match.each do |role|
             new_column = "name-#{num}:name_role-#{role[1].to_i + 1}:name_role_term.value"
             csv.rename_column(role.string, "name-#{num}:name_role-#{role[1].to_i + 1}:name_role_term.value")
-            csv.value_to_uri(new_column, new_column.gsub('.value', '.uri'), HyacinthExport::UriMapping::ROLES_MAP)
+            csv.value_to_uri(new_column, new_column.gsub('.value', '.uri'), HyacinthMapping::UriMapping::ROLES_MAP)
           end
 
           csv.rename_column(name.string, "name-#{num}:name_term.value")
@@ -107,8 +108,8 @@ module HyacinthExport::Mappings
 
         # Degree and URI Mappings
         csv.value_to_uri('degree-1:degree_name', 'degree-1:degree_level', DEGREE_TO_NUM, case_sensitive: true)
-        csv.value_to_uri('genre-1:genre_term.value', 'genre-1:genre_term.uri', HyacinthExport::UriMapping::GENRE_MAP)
-        csv.value_to_uri('language-1:language_term.value', 'language-1:language_term.uri', HyacinthExport::UriMapping::LANGUAGE_MAP)
+        csv.value_to_uri('genre-1:genre_term.value', 'genre-1:genre_term.uri', HyacinthMapping::UriMapping::GENRE_MAP)
+        csv.value_to_uri('language-1:language_term.value', 'language-1:language_term.uri', HyacinthMapping::UriMapping::LANGUAGE_MAP)
 
         csv.map_subjects_to_fast
 
@@ -116,4 +117,5 @@ module HyacinthExport::Mappings
       end
     end
   end
+end
 end

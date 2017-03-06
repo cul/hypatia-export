@@ -1,4 +1,4 @@
-module HyacinthExport
+module HyacinthMapping
   module UriMapping
     GENRE_MAP = {
       'abstracts' => 'http://vocab.getty.edu/aat/300026032',

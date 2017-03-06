@@ -1,6 +1,6 @@
 require 'csv'
 
-module HyacinthExport
+module HyacinthMapping
   class CSV
     attr_accessor :table, :prefix, :export_filepath, :import_filepath
 
@@ -143,7 +143,7 @@ module HyacinthExport
     # Maps subjects that don't have URIs and are valid ProQuest subjects to Fast
     # Subjects. One subject can map to 0+ fast topics and 0+ fast geographic topics.
     def map_subjects_to_fast
-      proquest_fast_map = HashWithIndifferentAccess.new(YAML.load_file("#{Rails.root}/lib/hyacinth_export/subject_to_fast_map.yml"))
+      proquest_fast_map = HashWithIndifferentAccess.new(YAML.load_file("#{Rails.root}/lib/hyacinth_mapping/subject_to_fast_map.yml"))
 
       self.table.each do |row|
         topics, geographic_topics = [], []

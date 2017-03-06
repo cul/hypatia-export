@@ -1,7 +1,22 @@
 require 'csv'
-require 'hyacinth_export/values'
+require 'hypatia_export/values'
 
-module HyacinthExport
+module HypatiaExport
+  DO_NOT_EXPORT = File.expand_path(File.join('~', 'Google Drive', 'AC4', 'Hypatia to Hyacinth Migration', 'Export CSVs', 'do_not_export.csv'))
+
+  def self.items_without_pids
+    filename = File.join('tmp', 'data', 'items_without_pids.csv')
+    ignore = do_not_export
+
+    CSV.open(filename, 'w', encoding: 'UTF-8') do |csv|
+      Item.all.find_each do |i|
+        next if ignore.include?(i.id) || !i.fedora_pid.blank?
+        csv.add_row [i.fedora_pid]
+      end
+    end
+    filename
+  end
+
   def self.export_fields(item_type_id) # Exports all fields for the same ItemType
     type = ItemType.find(item_type_id) # Find a class of item (journal article, image, Oral History Object).
     # item = Item.find(4066)
@@ -23,32 +38,16 @@ module HyacinthExport
           fields = headers.map { |hdr| value.send hdr }
           csv.add_row(fields)
         end
-
-        # Gets the relationships between the different values attached to this item???
-        #
-        # values_hierarchy = Hash.new {|hash,key| hash[key] = Hash.new &hash.default_proc }
-        # current = values_hierarchy[root.id]
-        # def children(values, map, parent_id)
-        #   values.select {|v| v.parent_id == parent_id }.each do |v|
-        #     children(values, map[v.id], v.id)
-        #   end
-        # end
-        # children(values, current, root.id)
-        # puts values_hierarchy.inspect
-
-        # Hyacinth format is _?[a-z_]+(-\d)? for element
-        # leading underscore is for reserved tag names
-        # -\d is for multiple values that need to be collected
-        # (:) to separate hierarchy
-        # .string_key for controlled values
-        # .uri and .value for URI values/labels
-        # nothing for plain old data
       end
     end
   end
 
   def self.export_values(items, filename)
-    elements_to_codes = HyacinthExport.elements_to_codes
+    elements_to_codes = HypatiaExport.elements_to_codes
+
+    # Remove items that aren't being exported.
+    ignore = do_not_export
+    items = items.reject { |i| ignore.include?(i.id) }
 
     headers = []
     value_maps = items.collect do |item|
@@ -58,6 +57,7 @@ module HyacinthExport
     end
     headers.uniq!
     headers.sort!
+
     ::CSV.open(filename, 'w', encoding: 'UTF-8') do |csv|
       csv.add_row(headers)
       value_maps.each do |value_map|
@@ -68,6 +68,11 @@ module HyacinthExport
   end
 
   ## Helpers
+
+  # Returns array of hypatia ids that should not be exported
+  def self.do_not_export
+    CSV.read(DO_NOT_EXPORT).drop(1).map(&:first).map(&:to_i)
+  end
 
   # parse the element paths & populate the id-to-code hash
   def self.elements_to_codes

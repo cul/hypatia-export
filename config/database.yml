@@ -10,8 +10,14 @@ default: &default
   timeout: 5000
 
 development:
-  <<: *default
-  database: db/development.sqlite3
+  adapter: mysql2
+  host: 127.0.0.1 #cdrs-db-prod2.cul.columbia.edu
+  port: 9001 #3311
+  database: hypatia_prod
+  username: hyp_prod_user
+  password: AAids6^^&&jpn
+  pool: 30
+  # secure_auth: false
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".

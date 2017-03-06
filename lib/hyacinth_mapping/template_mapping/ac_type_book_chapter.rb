@@ -46,7 +46,7 @@ module HyacinthMapping::TemplateMapping
           copyright:copyRightsName copyright:copyRightsContact copyright:copyPubStatus
           copyright:copyCopyStatus copyright:copyCountry noteRef locURL identifier:IDidentifierURI
           nameTypeCorporate:displayForm identifier:iDIdentifierLocal recInfRecordOrigin
-          identifier:IDidentifierDOI
+          identifier:IDidentifierDOI nameTypeConference:namePart nameTypeConference:nameRoleTerm
         })
 
         # Merge to handle columns
@@ -116,13 +116,13 @@ module HyacinthMapping::TemplateMapping
           name_type = "parent_publication-1:parent_publication_name-#{num}:parent_publication_name_term.name_type"
           csv.add_column(name_type)
           csv.table.each do |row|
-          unless row[name_value].blank?
-            row[name_type] = 'personal'
+            unless row[name_value].blank?
+              row[name_type] = 'personal'
+            end
           end
-        end
 
-        # Delete extra name columns no longer needed
-        csv.delete_columns(["#{name[1]}:namePartDate", "#{name[1]}:namePartGiven"])
+          # Delete extra name columns no longer needed
+          csv.delete_columns(["#{name[1]}:namePartDate", "#{name[1]}:namePartGiven"])
         end
 
         num_sub_topic = csv.headers.select { |h| /^#{PREFIX}:subjectTopic-?(\d*)$/.match(h) }.count

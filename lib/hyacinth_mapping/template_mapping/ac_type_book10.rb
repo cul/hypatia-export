@@ -27,7 +27,8 @@ module HyacinthMapping::TemplateMapping
         'typeResc'                           => 'type_of_resource-1:type_of_resource_value',
         'nameTypeCorporate:namePart'         => 'name-1:name_term.value',
         'nameTypeCorporate:nameRoleTerm'     => 'name-1:name_role-1:name_role_term.value',
-        'nameTypeCorporate:nameRoleTerm-1'   => 'name-1:name_role-2:name_role_term.value'
+        'nameTypeCorporate:nameRoleTerm-1'   => 'name-1:name_role-2:name_role_term.value',
+        'relatedItemSeries:seriesID'         => 'series-1:series_is_columbia'
 
       }
 

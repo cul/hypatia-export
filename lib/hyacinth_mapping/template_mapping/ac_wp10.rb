@@ -24,7 +24,9 @@ module HyacinthMapping::TemplateMapping
         'relatedItemSeries:tiInfoTitle'    => 'series-1:series_title',
         'tiInfoTitle'                      => 'title-1:title_sort_portion',
         'typeResc'                         => 'type_of_resource-1:type_of_resource_value',
-        'noteField'                        => 'note-1:note_value'
+        'noteField'                        => 'note-1:note_value',
+        'relatedItemSeries:seriesID'       => 'series-1:series_is_columbia'
+
       }
 
       def from_acwp10(export_filepath, import_filepath)

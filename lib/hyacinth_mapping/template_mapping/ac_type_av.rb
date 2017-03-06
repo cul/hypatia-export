@@ -20,7 +20,8 @@ module HyacinthMapping::TemplateMapping
         'tiInfoTitle'          => 'title-1:title_sort_portion',
         'typeResc'             => 'type_of_resource-1:type_of_resource_value',
         'relatedItemSeries:partNumber' => 'series-1:series_number',
-        'relatedItemSeries:title'      => 'series-1:series_title'
+        'relatedItemSeries:title'      => 'series-1:series_title',
+        'relatedItemSeries:seriesID'   => 'series-1:series_is_columbia'
       }
 
       def from_actypeav(export_filepath, import_filepath)

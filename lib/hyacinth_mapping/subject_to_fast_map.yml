@@ -1839,3 +1839,7 @@ biomedical informatics:
   topic:
   - label: Bioinformatics
     uri: http://id.worldcat.org/fast/832181
+history (united states and western europe):
+  topic:
+  - label: History
+    url: http://id.worldcat.org/fast/958235

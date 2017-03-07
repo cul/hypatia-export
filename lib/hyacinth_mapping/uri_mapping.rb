@@ -77,6 +77,7 @@ module HyacinthMapping
       'translator' => 'http://id.loc.gov/vocabulary/relators/trl',
       'originator' => 'http://id.loc.gov/vocabulary/relators/org',
       'author of screenplay' => 'http://id.loc.gov/vocabulary/relators/aut',
+      'degree grantor' => 'http://id.loc.gov/vocabulary/relators/org'
     }
   end
 end

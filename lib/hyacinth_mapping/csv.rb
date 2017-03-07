@@ -82,7 +82,7 @@ module HyacinthMapping
         if uri
           row[uri_column_name] = uri
         else
-          raise "could not find matching value for #{value}"
+          puts "WARN: could not find matching value/uri for #{value}"
         end
       end
     end
@@ -167,7 +167,7 @@ module HyacinthMapping
             geographic_topics.concat(fast_mapping[:geographic] || [])
           else
             topics.append({ label: subject, uri: uri })
-            puts "No fast mapping for \"#{subject}\""
+            puts "WARN: No fast mapping for \"#{subject}\""
           end
 
           row[sub_header] = nil

@@ -1,44 +1,46 @@
 require 'hyacinth_mapping/uri_mapping'
 
 module HyacinthMapping::TemplateMapping
-  module AcDissertation
+  module AcTypeBook
     def self.included(base)
       base.extend ClassMethods
     end
 
     module ClassMethods
-      DEGREE_TO_NUM = {
-        'undergraduate' => 0, 'master\'s' => 1, 'doctoral' => 2
-      }
-      PREFIX = 'acDissertation'
+      PREFIX = 'acTypeBook'
       MAP = {
         'abstract'             => 'abstract-1:abstract_value',
-        'langLanguageTermText' => 'language-1:language_term.value',
-        'originDateIssued'     => 'date_issued-1:date_issued_start_value',
-        'typeResc'             => 'type_of_resource-1:type_of_resource_value',
         'genreGenre'           => 'genre-1:genre_term.value',
         'iDIdentifierHandle'   => 'cnri_handle_identifier-1:cnri_handle_identifier_value',
+        'iDIdentifierISBN'     => 'isbn-1:isbn_value',
+        'langLanguageTermText' => 'language-1:language_term.value',
         'noteField'            => 'note-1:note_value',
-        'tiInfoTitle'          => 'title-1:title_sort_portion',
-        'acDissDegree:dissDegreeLevel'      => 'degree-1:degree_name',
-        'acDissDegree:dissDegreeDiscipline' => 'degree-1:degree_discipline',
+        'originDateIssued'                   => 'date_issued-1:date_issued_start_value',
+        'originPlace:originCity'             => 'place_of_origin-1:place_of_origin_value',
+        'originPlaceText'                    => 'place_of_origin-1:place_of_origin_value',
+        'originPublisher'                    => 'publisher-1:publisher_value',
+        'relatedItemSeries:iDIdentifierISSN' => 'series-1:series_issn',
+        'relatedItemSeries:partNumber'       => 'series-1:series_number',
+        'relatedItemSeries:tiInfoTitle'      => 'series-1:series_title',
+        'tiInfoTitle'                        => 'title-1:title_sort_portion',
+        'typeResc'                           => 'type_of_resource-1:type_of_resource_value',
       }
 
-      def from_acdissertation(export_filepath, import_filepath)
+      def from_actypebookchapter(export_filepath, import_filepath)
         csv = HyacinthMapping::CSV.new(export_filepath, import_filepath, prefix: PREFIX)
 
         csv.delete_columns(%w{
-          Attachments tableOfContents recInfRecordOrigin physDsInternetMediaType
-          physDsExtentPages physDsExtentFileSize locURL iDIdentifierLocal
-          extAuthorRightsStatement acDissDegree:dissDegreeName copyright:copyYear
-          copyright:copyRightsNote copyright:copyRightsName copyright:copyRightsContact
-          copyright:copyPubStatus copyright:copyCountry copyright:copyCopyStatus
-          copyright:copyCopyStatement copyright:accCCStatements copyPubStatus
-          copyCopyNotice copyCopyStatus copyEmbargo:EmPeerReview copyEmbargo:EmRsrcVsbl
-          copyEmbargo:copyEmAccessLevel copyEmbargo:copyEmDateBegin copyEmbargo:copyEmDateEnd
-          copyEmbargo:copyEmIssuedBy copyEmbargo:copyEmNote subjectGeoCode
-          subjectTopicCU nameTypeCorporate:displayForm
+          Attachments classLC copyEmbargo:EmRsrcVsbl
+          copyEmbargo:copyEmAccessLevel	copyEmbargo:copyEmDateBegin
+          copyEmbargo:copyEmDateEnd	copyEmbargo:copyEmIssuedBy
+          copyEmbargo:copyEmNote	copyright:accCCStatements
+          copyright:copyCopyNotice	copyright:copyCopyStatement
+         	copyright:copyCopyStatus	copyright:copyCountry
+          copyright:copyPubStatus copyright:copyRightsContact copyright:copyRightsName
+          copyright:copyRightsNote copyright:copyYear extAuthorRightsStatement
+          iDIdentifierLocal identifierDOI
         })
+
 
         # Map corporate names
         corporate_matches = csv.headers.map { |h| /#{PREFIX}:(nameTypeCorporate-?(\d*)):namePart/.match(h) }.compact
@@ -57,7 +59,7 @@ module HyacinthMapping::TemplateMapping
         end
 
         # Map personal names
-        name_matches = csv.headers.map{ |h| /#{PREFIX}:(acDissNamePersonal-?(\d*)):namePartFamily/.match(h) }.compact
+        name_matches = csv.headers.map{ |h| /#{PREFIX}:(nameAffil-?(\d*)):namePartFamily/.match(h) }.compact
         name_matches.each do |name|
           csv.combine_name("#{PREFIX}:#{name[1]}:namePartGiven", "#{PREFIX}:#{name[1]}:namePartFamily")
           csv.merge_columns("#{name[1]}:affilAffiliation:affilAuIDUNI", "#{name[1]}:affilAuIDUNI")
@@ -100,7 +102,6 @@ module HyacinthMapping::TemplateMapping
         end
 
         # Map role terms from values to uris
-        csv.value_to_uri('degree-1:degree_name', 'degree-1:degree_level', DEGREE_TO_NUM)
         csv.value_to_uri('genre-1:genre_term.value', 'genre-1:genre_term.uri', HyacinthMapping::UriMapping::GENRE_MAP)
         csv.value_to_uri('language-1:language_term.value', 'language-1:language_term.uri', HyacinthMapping::UriMapping::LANGUAGE_MAP)
 

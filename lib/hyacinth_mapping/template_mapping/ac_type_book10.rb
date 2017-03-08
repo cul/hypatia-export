@@ -60,7 +60,7 @@ module HyacinthMapping::TemplateMapping
           # Role uri
           role_column = "name-#{num}:name_role-1:name_role_term.value"
           csv.rename_column("#{PREFIX}:#{name[1]}:nameRoleTerm", role_column)
-          csv.value_to_uri(role_column, role_column.gsub('.value', '.uri'), HyacinthMapping::UriMapping::ROLES_MAP)
+          csv.map_values_to_uri(role_column, HyacinthMapping::UriMapping::ROLES_MAP)
 
           csv.add_name_type(num: num, type: 'personal')
 
@@ -88,15 +88,15 @@ module HyacinthMapping::TemplateMapping
         end
 
         # Map role terms from values to uris
-        csv.value_to_uri('genre-1:genre_term.value', 'genre-1:genre_term.uri', HyacinthMapping::UriMapping::GENRE_MAP)
-        csv.value_to_uri('language-1:language_term.value', 'language-1:language_term.uri', HyacinthMapping::UriMapping::LANGUAGE_MAP)
+        csv.map_values_to_uri('genre-1:genre_term.value', HyacinthMapping::UriMapping::GENRE_MAP)
+        csv.map_values_to_uri('language-1:language_term.value', HyacinthMapping::UriMapping::LANGUAGE_MAP)
 
         # Add type for first (corporate) name.
         csv.add_name_type(num: 1, type: 'corporate')
 
         # Add role uri for corporate name.
-        csv.value_to_uri("name-1:name_role-1:name_role_term.value", "name-1:name_role-1:name_role_term.uri", HyacinthMapping::UriMapping::ROLES_MAP)
-        csv.value_to_uri("name-1:name_role-2:name_role_term.value", "name-1:name_role-2:name_role_term.uri", HyacinthMapping::UriMapping::ROLES_MAP)
+        csv.map_values_to_uri("name-1:name_role-1:name_role_term.value", HyacinthMapping::UriMapping::ROLES_MAP)
+        csv.map_values_to_uri("name-1:name_role-2:name_role_term.value", HyacinthMapping::UriMapping::ROLES_MAP)
 
         # Map proquest subjects to fast subjects
         csv.map_subjects_to_fast

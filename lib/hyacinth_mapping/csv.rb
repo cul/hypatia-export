@@ -71,18 +71,37 @@ module HyacinthMapping
       delete_columns(columns.drop(1), with_prefix: true)
     end
 
-    def value_to_uri(value_column, uri_column_name, map, case_sensitive: false)
+    def map_values_to_uri(value_column, map)
+      uri_column = value_column.gsub('value', 'uri')
+      authority_column = value_column.gsub('value', 'authority')
+      add_column(uri_column, authority_column)
+
+      self.table.each do |row|
+        next if row[value_column].blank?
+        value = row[value_column]
+        value = value.downcase
+        uri = map[value]
+        if uri
+          row[uri_column] = uri
+          row[authority_column] = authority_for(uri)
+        else
+          puts "WARN: could not find matching uri for #{value}"
+        end
+      end
+    end
+
+    def map_values(value_column, mapped_column, map, case_sensitive: false)
       # update the values in the value column to uris
-      add_column(uri_column_name)
+      add_column(mapped_column)
       self.table.each do |row|
         next if row[value_column].blank?
         value = row[value_column]
         value = value.downcase unless case_sensitive
-        uri = map[value]
-        if uri
-          row[uri_column_name] = uri
+        new_value = map[value]
+        if new_value
+          row[mapped_column] = new_value
         else
-          puts "WARN: could not find matching value/uri for #{value}"
+          puts "WARN: could not find matching value for #{value}"
         end
       end
     end
@@ -150,9 +169,10 @@ module HyacinthMapping
         subject_headers = headers.select { |h| /subject_topic-(\d+):subject_topic_term.value/.match(h) }
         subject_headers.each do |sub_header|
           uri_column = sub_header.gsub('value', 'uri')
-          unless headers.include?(uri_column)
-            add_column(uri_column)
-          end
+          authority_column = sub_header.gsub('value', 'authority')
+
+          add_column(uri_column)       unless headers.include?(uri_column)
+          add_column(authority_column) unless headers.include?(authority_column)
 
           subject = row[sub_header]
           subject = subject.strip unless subject.nil?
@@ -172,6 +192,7 @@ module HyacinthMapping
 
           row[sub_header] = nil
           row[uri_column] = nil
+          row[authority_column] = nil
         end
 
         # Removing duplicates
@@ -186,7 +207,8 @@ module HyacinthMapping
           (1..num).each do |i|
             new_header = "subject_geographic-#{geographic_headers.size + i}:subject_geographic_term.value"
             new_uri_header = new_header.gsub('value', 'uri')
-            add_column(new_header, new_uri_header)
+            new_authority_header = new_header.gsub('value', 'authority')
+            add_column(new_header, new_uri_header, new_authority_header)
             empty << new_header
           end
         end
@@ -221,6 +243,22 @@ module HyacinthMapping
 
     private
 
+    def authority_for(uri)
+      authority_map = {
+        'marcrelator' => 'http://id.loc.gov/vocabulary/relators/',
+        'iso639-2b'	  => 'http://id.loc.gov/vocabulary/iso639-2/',
+        'fast'        => 'http://id.worldcat.org/fast/',
+        'aat'	        => 'http://vocab.getty.edu/aat/',
+        'gmgpc'	      => 'http://id.loc.gov/vocabulary/graphicMaterials/',
+        'lcgft'	      => 'http://id.loc.gov/authorities/genreForms/',
+        # 'tbd'            => 'http://purl.org/coar/resource_type/',
+      }
+
+      name, beg_uri = authority_map.find { |_, value| /^#{Regexp.escape(value)}.*$/ =~ uri }
+      puts "WARN: Could not find authority for #{uri}" if name.nil?
+      name
+    end
+
     def column_empty?(name)
       self.table.each do |row|
         return false unless row[name].blank?
@@ -237,6 +275,7 @@ module HyacinthMapping
         raise 'not enough empty columns' if column.nil?
         row[column] = topic[:label]
         row[column.gsub('value', 'uri')] = topic[:uri]
+        row[column.gsub('value', 'authority')] = 'fast' unless topic[:uri].blank?
       end
     end
   end

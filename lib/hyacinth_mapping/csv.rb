@@ -14,9 +14,9 @@ module HyacinthMapping
       array_of_rows = array_of_arrays.drop(1).map { |r| ::CSV::Row.new(headers, r) }
       self.table = ::CSV::Table.new(array_of_rows)
 
-      # Add project column and remove _hypatia_id
+      # Add project column and rename _hypatia_id
       add_column('_project.string_key', default_content: 'academic_commons')
-      delete_columns(['_hypatia_id'], with_prefix: true)
+      rename_column('_hypatia_id', 'hypatia_identifier-1:hypatia_identifier_value')
     end
 
     def headers

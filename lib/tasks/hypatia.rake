@@ -34,6 +34,10 @@ namespace :hypatia do
       puts "pass item_type=ID [limit=LIMIT] [in_batches=true]"
     end
 
+    # Remove items that aren't being exported.
+    ignore = HypatiaExport.do_not_export
+    items = items.reject { |i| ignore.include?(i.id) }
+
     code = ItemType.find(item_type).element.code
     if in_batches
       items.each_slice(500).with_index do |group, idx|
@@ -46,14 +50,18 @@ namespace :hypatia do
     end
   end
 
+  task :export_many_templates => :environment do
+    # ENV['in_batches'] = 'true'
+
+    ['33', '34', '32', '31', '29', '23', '21', '20', '19', '18', '17'].each do |num|
+      ENV['item_type'] = num
+      Rake::Task['hypatia:export_template'].execute
+    end
+  end
+
   desc 'retrieve all items that are being exported without pids'
   task :items_without_pids => :environment do
     filename = HypatiaExport.items_without_pids
     puts "Output csv at #{filename}"
-  end
-
-  desc 'retrieve all items that are embargoed and do not have pids'
-  task :embargoed_items_without_pids => :environment do
-    puts 'not implemented'
   end
 end

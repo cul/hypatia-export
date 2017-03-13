@@ -11,7 +11,8 @@ module HypatiaExport
     CSV.open(filename, 'w', encoding: 'UTF-8') do |csv|
       Item.all.find_each do |i|
         next if ignore.include?(i.id) || !i.fedora_pid.blank?
-        csv.add_row [i.fedora_pid]
+        puts i.id
+        csv.add_row [i.id]
       end
     end
     filename
@@ -44,10 +45,6 @@ module HypatiaExport
 
   def self.export_values(items, filename)
     elements_to_codes = HypatiaExport.elements_to_codes
-
-    # Remove items that aren't being exported.
-    ignore = do_not_export
-    items = items.reject { |i| ignore.include?(i.id) }
 
     headers = []
     value_maps = items.collect do |item|

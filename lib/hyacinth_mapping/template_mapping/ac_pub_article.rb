@@ -21,7 +21,7 @@ module HyacinthMapping::TemplateMapping
         'relatedArticleHost:partIssue'        => 'parent_publication-1:parent_publication_issue',
         'relatedArticleHost:partVolume'       => 'parent_publication-1:parent_publication_volume',
         'relatedArticleHost:tiInfoTitle'      => 'parent_publication-1:parent_publication_title-1:parent_publication_title_sort_portion',
-        'typeResc'             => 'type_of_resource-1:type_of_resource_value',
+        'typeResc'                            => 'type_of_resource-1:type_of_resource_value',
                 # 'tiInfoTitle'          => 'title-1:title_sort_portion',
 
       }

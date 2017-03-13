@@ -236,8 +236,9 @@ module HyacinthMapping
       subject_headers = headers.select { |h| /subject_topic-(\d+):subject_topic_term.value/.match(h) }
       subject_headers.each do |s|
         uri = s.gsub('value', 'uri')
+        authority = s.gsub('value', 'authority')
         if column_empty?(s) && column_empty?(uri)
-          delete_columns([s, uri], with_prefix: true)
+          delete_columns([s, uri, authority], with_prefix: true)
         end
       end
     end

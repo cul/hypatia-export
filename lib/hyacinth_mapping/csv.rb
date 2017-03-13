@@ -16,6 +16,7 @@ module HyacinthMapping
 
       # Add project column and rename _hypatia_id
       add_column('_project.string_key', default_content: 'academic_commons')
+      add_column('_digital_object_type.string_key', default_content: 'item')
       rename_column('_hypatia_id', 'hypatia_identifier-1:hypatia_identifier_value')
     end
 

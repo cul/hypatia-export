@@ -1843,3 +1843,75 @@ history (united states and western europe):
   topic:
   - label: History
     uri: http://id.worldcat.org/fast/958235
+business and economics:
+  topic:
+  - label: Managerial economics
+    uri: http://id.worldcat.org/fast/1007340
+french language and literature:
+  topic:
+  - label: French literature
+    uri: http://id.worldcat.org/fast/934688
+mathematics and statistics:
+  topic:
+  - label: Mathematical statistics
+    uri: http://id.worldcat.org/fast/1012127
+biological sciences:
+  topic:
+  - label: Biology
+    uri: http://id.worldcat.org/fast/832383
+international and public affairs:
+  topic:
+  - label: International relations
+    uri: http://id.worldcat.org/fast/977053
+children's mental health:
+  topic:
+  - label: Child mental health
+    uri: http://id.worldcat.org/fast/854485
+measuring poverty:
+  topic:
+  - label: Poverty--Measurement
+    uri: http://id.worldcat.org/fast/1074112
+immigrant families:
+  topic:
+  - label: Immigrant families
+  	uri: http://id.worldcat.org/fast/1746411
+child poverty:
+  topic:
+  - label: Poor children
+    uri: http://id.worldcat.org/fast/1071167
+early care and learning:
+  topic:
+  - label: Early childhood education
+    uri: http://id.worldcat.org/fast/900596
+infants and toddlers:
+  topic:
+  - label: Children
+    uri: http://id.worldcat.org/fast/854835
+international business enterprises--developing countries:
+  topic:
+  - label: International business enterprises
+    uri: http://id.worldcat.org/fast/976774
+adolescent health and youth development:
+  topic:
+  - label: Health behavior in adolescence
+    uri: http://id.worldcat.org/fast/952835
+social security:
+  topic:
+  - label: Social security
+    uri: http://id.worldcat.org/fast/1123077
+oceanography--philippines:
+  topic:
+  - label: Oceanography
+    uri: http://id.worldcat.org/fast/1043671
+copyright:
+  topic:
+  - label: Copyright
+    uri: http://id.worldcat.org/fast/878706
+elderly care and learning:
+  topic:
+  - label: Geriatrics
+    uri: http://id.worldcat.org/fast/941257
+low-wage work:
+  topic:
+  - label: Wages
+    uri: http://id.worldcat.org/fast/1169492

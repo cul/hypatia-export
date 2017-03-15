@@ -26,7 +26,7 @@ module HyacinthMapping::TemplateMapping
         'typeResc'                           => 'type_of_resource-1:type_of_resource_value',
       }
 
-      def from_actypebookchapter(export_filepath, import_filepath)
+      def from_actypebook(export_filepath, import_filepath)
         csv = HyacinthMapping::CSV.new(export_filepath, import_filepath, prefix: PREFIX)
 
         csv.delete_columns(%w{
@@ -51,7 +51,7 @@ module HyacinthMapping::TemplateMapping
           role_match.each do |role|
             new_column = "name-#{num}:name_role-#{role[1].to_i + 1}:name_role_term.value"
             csv.rename_column(role.string, "name-#{num}:name_role-#{role[1].to_i + 1}:name_role_term.value")
-            csv.map_values_to_uri(new_column, new_column.gsub('.value', '.uri'), HyacinthMapping::UriMapping::ROLES_MAP)
+            csv.map_values_to_uri(new_column, HyacinthMapping::UriMapping::ROLES_MAP)
           end
 
           csv.rename_column(name.string, "name-#{num}:name_term.value")

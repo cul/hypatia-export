@@ -30,6 +30,7 @@ gem 'acts_as_tree'
 
 gem 'rubydora'
 
+gem 'htmlentities'
 # Use Unicorn as the app server
 # gem 'unicorn'
 

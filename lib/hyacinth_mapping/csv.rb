@@ -11,7 +11,13 @@ module HyacinthMapping
 
       array_of_arrays = ::CSV.read(self.export_filepath, encoding: 'UTF-8')
       headers = array_of_arrays.first
-      array_of_rows = array_of_arrays.drop(1).map { |r| ::CSV::Row.new(headers, r) }
+
+      coder = HTMLEntities.new  # used to convert encoded characters.
+
+      array_of_rows = array_of_arrays.drop(1).map do |r|
+        r = r.map { |cell| coder.decode(cell) } # remove encoded characters
+        ::CSV::Row.new(headers, r)
+      end
       self.table = ::CSV::Table.new(array_of_rows)
 
       # Add project column and rename _hypatia_id

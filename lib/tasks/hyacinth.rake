@@ -19,15 +19,42 @@ namespace :hyacinth do
   end
 
   task :create_many_csvs => :environment do
-    [ 'acTypeBook10',
-      'acTypeBookChapter10',
+    [ 'acTypeBookChapter10',
       'acWP10',
       'acTypeAV',
       'acTypeUnpubItem10',
-      'acTypeBookChapter'
+      'acTypeBookChapter',
+      'acDissertation'
     ].each do |code|
       ENV['item_type_code'] = code
       Rake::Task['hyacinth:create_csv_for'].execute
+    end
+  end
+
+  task :decode_html_entities do
+    if ENV['filepath']
+      filepath = ENV['filepath']
+    else
+      puts "pass filepath=filepath"
+    end
+
+    require 'htmlentities'
+    coder = HTMLEntities.new
+
+    array_of_arrays = ::CSV.read(filepath, encoding: 'UTF-8')
+    decoded_arrays = array_of_arrays.each_with_index.map do |array, i|
+      if i.zero? # Ignoring header
+        array
+      else
+        array.map { |cell| coder.decode(cell) }
+      end
+    end
+    # ignore header column
+    # go through every cell and run through html entities decoder
+    CSV.open(filepath, "w+") do |csv|
+      decoded_arrays.each do |r|
+        csv.add_row r
+      end
     end
   end
 

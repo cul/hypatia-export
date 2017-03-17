@@ -1,52 +1,55 @@
 require 'hyacinth_mapping/uri_mapping'
 
 module HyacinthMapping::TemplateMapping
-  module AcPubArticle
+  module AcWp
     def self.included(base)
       base.extend ClassMethods
     end
 
     module ClassMethods
-      PREFIX = 'acPubArticle'
+      PREFIX = 'acWP'
       MAP = {
         'abstract'             => 'abstract-1:abstract_value',
         'genreGenre'           => 'genre-1:genre_term.value',
-        'identifierHDL'        => 'cnri_handle_identifier-1:cnri_handle_identifier_value',
+        'iDIdentifierHandle'   => 'cnri_handle_identifier-1:cnri_handle_identifier_value',
         'langLanguageTermText' => 'language-1:language_term.value',
         'noteField'            => 'note-1:note_value',
         'originDateIssued'     => 'date_issued-1:date_issued_start_value',
+        'originPlaceText'      => 'place_of_origin-1:place_of_origin_value',
+        'originPublisher'      => 'publisher-1:publisher_value',
+        'relatedItemSeries:partNumber' => 'series-1:series_number',
+        'relatedItemSeries:tiInfoTitle' => 'series-1:series_title',
         'tiInfoTitle'          => 'title-1:title_sort_portion',
-        'relatedArticleHost:identifierDOI'    => 'parent_publication-1:parent_publication_doi',
-        'relatedArticleHost:iDIdentifierISSN' => 'parent_publication-1:parent_publication_issn',
-        'relatedArticleHost:partExtentEnd'    => 'parent_publication-1:parent_publication_page_end',
-        'relatedArticleHost:partExtentStart'  => 'parent_publication-1:parent_publication_page_start',
-        'relatedArticleHost:partIssue'        => 'parent_publication-1:parent_publication_issue',
-        'relatedArticleHost:partVolume'       => 'parent_publication-1:parent_publication_volume',
-        'relatedArticleHost:tiInfoTitle'      => 'parent_publication-1:parent_publication_title-1:parent_publication_title_sort_portion',
-        'typeResc'                            => 'type_of_resource-1:type_of_resource_value',
+        'typeResc'             => 'type_of_resource-1:type_of_resource_value',
       }
 
-      def from_acpubarticle(export_filepath, import_filepath)
+      def from_acwp(export_filepath, import_filepath)
         csv = HyacinthMapping::CSV.new(export_filepath, import_filepath, prefix: PREFIX)
 
         csv.delete_columns(%w{
-          Attachments copyEmbargo:EmPeerReview copyEmbargo:EmRsrcVsbl copyEmbargo:copyEmAccessLevel
-          copyEmbargo:copyEmDateBegin copyEmbargo:copyEmDateEnd copyEmbargo:copyEmIssuedBy
-          copyEmbargo:copyEmNote copyright:accCCStatements copyright:copyCopyNotice
-          copyright:copyCopyStatement copyright:copyCopyStatement-1 copyright:copyCopyStatus copyright:copyCountry
-          copyright:copyPubStatus copyright:copyRightsContact copyright:copyRightsName
-          copyright:copyRightsNote copyright:copyYear extAuthorRightsStatement
-          identifier:IDidentifierDOI identifier:IDidentifierURI identifier:iDIdentifierHandle
-          identifier:iDIdentifierLocal identifierDOI locURL physDsExtentFileSize
-          physDsExtentPages physDsInternetMediaType recInfRecordOrigin physDsInternetMediaType-1
-          relatedArticleHost:partDateYear tableOfContents
-          relatedArticleHost-1:iDIdentifierISSN relatedArticleHost-1:partDateYear relatedArticleHost-1:partExtentEnd
-          relatedArticleHost-1:partExtentStart relatedArticleHost-1:partIssue relatedArticleHost-1:partVolume
-          relatedArticleHost-1:tiInfoTitle genreGenre-1 langLanguageTermText-1 noteField-1 typeResc-1
+          Attachment locURL originCity originPlace:originCity originPlace:originCountry
+          originPlace:originState copyEmbargo:copyEmAccessLevel copyEmbargo:copyEmDateBegin
+          copyEmbargo:copyEmDateEnd copyEmbargo:copyEmIssuedBy copyEmbargo:copyEmNote
+          copyEmbargo:EmPeerReview
+          copyright:accCCStatements copyright:copyCopyNotice copyright:copyCopyStatement
+          copyright:copyCopyStatus copyright:copyCountry copyright:copyPubStatus
+          copyright:copyRightsContact copyright:copyRightsName copyright:copyRightsNote
+          copyright:copyYear extAuthorRightsStatement identifier:IDidentifierURI
+          identifier:iDIdentifierLocal relatedItemSeries:seriesID physDsInternetMediaType
+          originState physDsExtentFileSize physDsExtentPages physDsInternetMediaTyperecInfRecordOrigin
+          tableOfContents nameTypeConference:namePart nameTypeConference:nameRoleTerm
+          recInfRecordOrigin physDsInternetMediaType-1 physDsInternetMediaType-2 physDsInternetMediaType-3
+          copyEmbargo:EmPeerReview copyEmbargo:EmRsrcVsbl copyright:copyCopyStatement-1
         })
 
         # Append title and subtitle
-        csv.append_columns('acPubArticle:tiInfoTitle', 'acPubArticle:tiInfoSubTitle', seperator: ': ')
+        csv.append_columns('acWP:tiInfoTitle', 'acWP:tiInfoSubTitle', seperator: ': ')
+
+        # Merge to handle columns
+        csv.merge_columns("identifier:iDIdentifierHandle", 'iDIdentifierHandle')
+
+        # Append note columns
+        csv.append_columns('acWP:noteField', 'acWP:noteField-1', 'noteField-2', 'acWP:noteRef')
 
         # Map corporate names
         corporate_matches = csv.headers.map { |h| /#{PREFIX}:(nameTypeCorporate-?(\d*)):namePart/.match(h) }.compact
@@ -62,6 +65,8 @@ module HyacinthMapping::TemplateMapping
 
           csv.rename_column(name.string, "name-#{num}:name_term.value")
           csv.add_name_type(num: num, type: 'corporate')
+
+          csv.delete_columns(["#{name[1]}:displayForm"])
         end
 
         # Map personal names
@@ -86,16 +91,11 @@ module HyacinthMapping::TemplateMapping
           # Delete role columns that contain duplicate data in this mapping
           to_delete = [
             'affilDept', 'affilDept-1', 'affilDept-2', 'affilDept-3', 'namePartGiven', 'affilDept', 'namePartDate',
-            'affilAffiliation:affilAuIDLocal', 'affilAffiliation:affilEmail', 'affilAffiliation:affilEmail-1',
-            'affilAffiliation:originCountry', 'affilAffiliation-1:originCountry', 'affilAffiliation-1:affilOrganization-1',
-            'affilAffiliation-1:affilOrganization', 'affilAffiliation-1:affilEmail-1', 'affilAffiliation-1:affilEmail',
-            'affilAffiliation:affilOrganization', 'affilAffiliation:affilOrganization-1', 'affilAffiliation-1:affilDeptOther-1',
-            'affilAffiliation-1:affilDeptOther', 'affilAffiliation-1:affilDept-1', 'affilAffiliation-1:affilDept',
-            'affilAffiliation:affilOrganization-2', 'affilAffiliation:affilDept', 'affilAffiliation:affilDept-1',
-            'affilAffiliation:affilDept-2', 'affilAffiliation:affilDeptOther', 'affilAffiliation-1:affilAuIDUNI',
+            'affilAffiliation:affilAuIDLocal', 'affilAffiliation:affilEmail', 'affilAffiliation:originCountry',
+            'affilAffiliation:affilOrganization', 'affilAffiliation:affilDept', 'affilAffiliation:affilDeptOther',
             'affilAffiliation:affilDeptOther-1', 'affilAffiliation:affilAuIDNAF', 'affilAffiliation:affilDeptOther-2',
-            'affiliation', 'nameID', 'affilAffiliation:affilDept-1', 'nameRoleTerm-1', 'affilAffiliation-1:affilAuIDNAF',
-            'affilAffiliation-1:affilAuIDLocal', 'affilAffiliation:affilDept-3'
+            'affiliation', 'nameID', 'affilAffiliation:affilDept-1', 'nameRoleTerm-1', 'affilAffiliation:affilOrganization-1',
+            'affilAffiliation:affilEmail-1'
           ].map { |a| "#{name[1]}:#{a}" }
           csv.delete_columns(to_delete)
         end
@@ -116,7 +116,7 @@ module HyacinthMapping::TemplateMapping
         csv.map_values_to_uri('genre-1:genre_term.value', HyacinthMapping::UriMapping::GENRE_MAP)
         csv.map_values_to_uri('language-1:language_term.value', HyacinthMapping::UriMapping::LANGUAGE_MAP)
 
-        # Map subjects to fast subjects
+        # Map proquest subjects to fast subjects
         csv.map_subjects_to_fast
 
         csv.export_to_file

@@ -13,4 +13,6 @@ module HyacinthMapping
   include TemplateMapping::AcDissertation
   include TemplateMapping::AcTypeBook
   include TemplateMapping::AcPubArticle
+  include TemplateMapping::AcWp
+  include TemplateMapping::AcTypeUnpubItem
 end

@@ -15,6 +15,8 @@ module HyacinthMapping::TemplateMapping
         'langLanguageTermText' => 'language-1:language_term.value',
         'noteField'            => 'note-1:note_value',
         'originDateIssued'     => 'date_issued-1:date_issued_start_value',
+        'tiInfoTitle'          => 'title-1:title_sort_portion',
+        'relatedArticleHost:identifierDOI'    => 'parent_publication-1:parent_publication_doi',
         'relatedArticleHost:iDIdentifierISSN' => 'parent_publication-1:parent_publication_issn',
         'relatedArticleHost:partExtentEnd'    => 'parent_publication-1:parent_publication_page_end',
         'relatedArticleHost:partExtentStart'  => 'parent_publication-1:parent_publication_page_start',
@@ -22,8 +24,6 @@ module HyacinthMapping::TemplateMapping
         'relatedArticleHost:partVolume'       => 'parent_publication-1:parent_publication_volume',
         'relatedArticleHost:tiInfoTitle'      => 'parent_publication-1:parent_publication_title-1:parent_publication_title_sort_portion',
         'typeResc'                            => 'type_of_resource-1:type_of_resource_value',
-                # 'tiInfoTitle'          => 'title-1:title_sort_portion',
-
       }
 
       def from_acpubarticle(export_filepath, import_filepath)
@@ -33,14 +33,20 @@ module HyacinthMapping::TemplateMapping
           Attachments copyEmbargo:EmPeerReview copyEmbargo:EmRsrcVsbl copyEmbargo:copyEmAccessLevel
           copyEmbargo:copyEmDateBegin copyEmbargo:copyEmDateEnd copyEmbargo:copyEmIssuedBy
           copyEmbargo:copyEmNote copyright:accCCStatements copyright:copyCopyNotice
-          copyright:copyCopyStatement copyright:copyCopyStatus copyright:copyCountry
+          copyright:copyCopyStatement copyright:copyCopyStatement-1 copyright:copyCopyStatus copyright:copyCountry
           copyright:copyPubStatus copyright:copyRightsContact copyright:copyRightsName
           copyright:copyRightsNote copyright:copyYear extAuthorRightsStatement
           identifier:IDidentifierDOI identifier:IDidentifierURI identifier:iDIdentifierHandle
           identifier:iDIdentifierLocal identifierDOI locURL physDsExtentFileSize
-          physDsExtentPages physDsInternetMediaType recInfRecordOrigin
-          relatedArticleHost:partDateYear subjectGeoCode tableOfContents
+          physDsExtentPages physDsInternetMediaType recInfRecordOrigin physDsInternetMediaType-1
+          relatedArticleHost:partDateYear subjectGeoCode tableOfContents subjectGeoCode-1
+          relatedArticleHost-1:iDIdentifierISSN relatedArticleHost-1:partDateYear relatedArticleHost-1:partExtentEnd
+          relatedArticleHost-1:partExtentStart relatedArticleHost-1:partIssue relatedArticleHost-1:partVolume
+          relatedArticleHost-1:tiInfoTitle genreGenre-1 langLanguageTermText-1 noteField-1 typeResc-1
         })
+
+        # Append title and subtitle
+        csv.append_columns('acPubArticle:tiInfoTitle', 'acPubArticle:tiInfoSubTitle', seperator: ': ')
 
         # Map corporate names
         corporate_matches = csv.headers.map { |h| /#{PREFIX}:(nameTypeCorporate-?(\d*)):namePart/.match(h) }.compact
@@ -80,11 +86,16 @@ module HyacinthMapping::TemplateMapping
           # Delete role columns that contain duplicate data in this mapping
           to_delete = [
             'affilDept', 'affilDept-1', 'affilDept-2', 'affilDept-3', 'namePartGiven', 'affilDept', 'namePartDate',
-            'affilAffiliation:affilAuIDLocal', 'affilAffiliation:affilEmail', 'affilAffiliation:originCountry',
-            'affilAffiliation:affilOrganization', 'affilAffiliation:affilDept', 'affilAffiliation:affilDept-1',
-            'affilAffiliation:affilDept-2', 'affilAffiliation:affilDeptOther',
+            'affilAffiliation:affilAuIDLocal', 'affilAffiliation:affilEmail', 'affilAffiliation:affilEmail-1',
+            'affilAffiliation:originCountry', 'affilAffiliation-1:originCountry', 'affilAffiliation-1:affilOrganization-1',
+            'affilAffiliation-1:affilOrganization', 'affilAffiliation-1:affilEmail-1', 'affilAffiliation-1:affilEmail',
+            'affilAffiliation:affilOrganization', 'affilAffiliation:affilOrganization-1', 'affilAffiliation-1:affilDeptOther-1',
+            'affilAffiliation-1:affilDeptOther', 'affilAffiliation-1:affilDept-1', 'affilAffiliation-1:affilDept',
+            'affilAffiliation:affilOrganization-2', 'affilAffiliation:affilDept', 'affilAffiliation:affilDept-1',
+            'affilAffiliation:affilDept-2', 'affilAffiliation:affilDeptOther', 'affilAffiliation-1:affilAuIDUNI',
             'affilAffiliation:affilDeptOther-1', 'affilAffiliation:affilAuIDNAF', 'affilAffiliation:affilDeptOther-2',
-            'affiliation', 'nameID', 'affilAffiliation:affilDept-1', 'nameRoleTerm-1',
+            'affiliation', 'nameID', 'affilAffiliation:affilDept-1', 'nameRoleTerm-1', 'affilAffiliation-1:affilAuIDNAF',
+            'affilAffiliation-1:affilAuIDLocal', 'affilAffiliation:affilDept-3'
           ].map { |a| "#{name[1]}:#{a}" }
           csv.delete_columns(to_delete)
         end

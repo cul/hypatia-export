@@ -1915,3 +1915,15 @@ low-wage work:
   topic:
   - label: Wages
     uri: http://id.worldcat.org/fast/1169492
+welfare:
+  topic:
+  - label: Public welfare
+    uri: http://id.worldcat.org/fast/1083250
+work supports:
+  topic:
+  - label: Public welfare
+    uri: http://id.worldcat.org/fast/1083251
+healthy development:
+  topic:
+  - label: Child development
+    uri: http://id.worldcat.org/fast/854393

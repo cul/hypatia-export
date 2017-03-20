@@ -63,7 +63,7 @@ module HyacinthMapping
         if !row[from].blank? && !row[to].blank? && row[to].strip != row[from].strip
           raise "Cannot merge #{from} and #{to} for the values #{row[from]} - #{row[to]}. Please merge manually."
         end
-        row[to] = row[from] || row[to]
+        row[to] = row[from] if row[to].blank?
       end
 
       # from column is deleted, to column is saved

@@ -1903,6 +1903,9 @@ oceanography--philippines:
   topic:
   - label: Oceanography
     uri: http://id.worldcat.org/fast/1043671
+  geographic:
+  - label: Philippines
+    uri: http://id.worldcat.org/fast/1205261
 copyright:
   topic:
   - label: Copyright
@@ -1927,3 +1930,98 @@ healthy development:
   topic:
   - label: Child development
     uri: http://id.worldcat.org/fast/854393
+labor laws and legislation:
+  topic:
+  - label: Labor laws and legislation
+    uri: http://id.worldcat.org/fast/989967
+bolivia:
+  geographic:
+  - label: Bolivia
+    uri: http://id.worldcat.org/fast/1205549
+sri lanka:
+  geographic:
+  - label: Sri Lanka
+    uri: http://id.worldcat.org/fast/1208730
+jerusalem:
+  geographic:
+  - label: Middle East--Jerusalem
+    uri: http://id.worldcat.org/fast/1216276
+ethiopia:
+  geographic:
+  - label: Ethiopia
+    uri: http://id.worldcat.org/fast/1205830
+russia:
+  geographic:
+  - label: Russia (Federation)
+    uri: http://id.worldcat.org/fast/1262050
+brazil:
+  geographic:
+  - label: Brazil
+    uri: http://id.worldcat.org/fast/1206830
+china:
+  geographic:
+  - label: China
+    uri: http://id.worldcat.org/fast/1206073
+india:
+  geographic:
+  - label: India
+    uri: http://id.worldcat.org/fast/1210276
+israel:
+  geographic:
+  - label: Israel
+    uri: http://id.worldcat.org/fast/1204236
+mexico:
+  geographic:
+  - label: Mexico
+    uri: http://id.worldcat.org/fast/1211700
+slovenia:
+  geographic:
+  - label: Slovenia
+    uri: http://id.worldcat.org/fast/1212712
+turkey:
+  geographic:
+  - label: Turkey
+    uri: http://id.worldcat.org/fast/1208963
+asia:
+  geographic:
+  - label: Asia
+    uri: http://id.worldcat.org/fast/1240495
+indonesia:
+  geographic:
+  - label: Indonesia
+    uri: http://id.worldcat.org/fast/1209242
+malawi:
+  geographic:
+  - label: Malawi
+    uri: http://id.worldcat.org/fast/1209242
+kenya:
+  geographic:
+  - label: Kenya
+    uri: http://id.worldcat.org/fast/1208718
+ghana:
+  geographic:
+  - label: Ghana
+    uri: http://id.worldcat.org/fast/1208741
+japan:
+  geographic:
+  - label: Japan
+    uri: http://id.worldcat.org/fast/1204082
+japanese studies:
+  topic:
+  - label: Japanese
+    uri: http://id.worldcat.org/fast/981362
+  geographic:
+  - label: Japan
+    uri: http://id.worldcat.org/fast/1204082
+nigeria:
+  geographic:
+  - label: Nigeria
+    uri: http://id.worldcat.org/fast/1205229
+senegal:
+  geographic:
+  - label: Senegal
+    uri: http://id.worldcat.org/fast/1204328
+africa:
+  geographic:
+  - label: Africa
+    uri: http://id.worldcat.org/fast/1239509

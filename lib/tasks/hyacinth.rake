@@ -24,7 +24,9 @@ namespace :hyacinth do
       'acTypeAV',
       'acTypeUnpubItem10',
       'acTypeBookChapter',
-      'acDissertation'
+      'acDissertation',
+      'acTypeBook',
+      'acPubArticle'
     ].each do |code|
       ENV['item_type_code'] = code
       Rake::Task['hyacinth:create_csv_for'].execute

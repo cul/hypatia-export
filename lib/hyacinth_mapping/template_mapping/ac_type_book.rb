@@ -32,11 +32,11 @@ module HyacinthMapping::TemplateMapping
 
         csv.delete_columns(%w{
           Attachments classLC copyEmbargo:EmRsrcVsbl tiInfoSubTitle originEdition
-          copyEmbargo:copyEmAccessLevel	copyEmbargo:copyEmDateBegin relatedItemSeries:iDIdentifierISSN-1
-          copyEmbargo:copyEmDateEnd	copyEmbargo:copyEmIssuedBy nameTypeConference:nameRoleTerm
-          copyEmbargo:copyEmNote	copyright:accCCStatements copyEmbargo:EmPeerReview
-          copyright:copyCopyNotice	copyright:copyCopyStatement nameTypeConference:namePart
-         	copyright:copyCopyStatus	copyright:copyCountry nameTypeConference:namePart
+          copyEmbargo:copyEmAccessLevel copyEmbargo:copyEmDateBegin relatedItemSeries:iDIdentifierISSN-1
+          copyEmbargo:copyEmDateEnd copyEmbargo:copyEmIssuedBy nameTypeConference:nameRoleTerm
+          copyEmbargo:copyEmNote copyright:accCCStatements copyEmbargo:EmPeerReview
+          copyright:copyCopyNotice copyright:copyCopyStatement nameTypeConference:namePart
+         	copyright:copyCopyStatus copyright:copyCountry nameTypeConference:namePart
           copyright:copyPubStatus copyright:copyRightsContact copyright:copyRightsName
           copyright:copyRightsNote copyright:copyYear extAuthorRightsStatement
           iDIdentifierLocal identifierDOI tableOfContents physDsInternetMediaType
@@ -45,6 +45,7 @@ module HyacinthMapping::TemplateMapping
           originPlace:originState noteRef locURL relatedItemSeries:partNumber-1
         })
 
+        csv.append_columns('acTypeBook:noteField', "acTypeBook:noteField-1")
 
         # Map corporate names
         corporate_matches = csv.headers.map { |h| /#{PREFIX}:(nameTypeCorporate-?(\d*)):namePart/.match(h) }.compact

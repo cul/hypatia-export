@@ -36,7 +36,7 @@ module HyacinthMapping::TemplateMapping
           copyright:copyCopyStatement copyright:copyCopyStatement-1 copyright:copyCopyStatus copyright:copyCountry
           copyright:copyPubStatus copyright:copyRightsContact copyright:copyRightsName
           copyright:copyRightsNote copyright:copyYear extAuthorRightsStatement
-          identifier:IDidentifierDOI identifier:IDidentifierURI identifier:iDIdentifierHandle
+          identifier:IDidentifierDOI identifier:IDidentifierURI
           identifier:iDIdentifierLocal identifierDOI locURL physDsExtentFileSize
           physDsExtentPages physDsInternetMediaType recInfRecordOrigin physDsInternetMediaType-1
           relatedArticleHost:partDateYear tableOfContents
@@ -45,8 +45,8 @@ module HyacinthMapping::TemplateMapping
           relatedArticleHost-1:tiInfoTitle genreGenre-1 langLanguageTermText-1 noteField-1 typeResc-1
         })
 
-        # Append title and subtitle
-        csv.append_columns('acPubArticle:tiInfoTitle', 'acPubArticle:tiInfoSubTitle', seperator: ': ')
+        # Merge to handle columns
+        csv.merge_columns("identifier:iDIdentifierHandle", 'identifierHDL')
 
         # Map corporate names
         corporate_matches = csv.headers.map { |h| /#{PREFIX}:(nameTypeCorporate-?(\d*)):namePart/.match(h) }.compact

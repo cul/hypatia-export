@@ -13,13 +13,14 @@ module HyacinthMapping::TemplateMapping
         'genreGenre'           => 'genre-1:genre_term.value',
         'iDIdentifierHandle'   => 'cnri_handle_identifier-1:cnri_handle_identifier_value',
         'langLanguageTermText' => 'language-1:language_term.value',
-        # 'noteField'            => 'note-1:note_value',
+        'noteField'            => 'note-1:note_value',
         'originDateIssued'     => 'date_issued-1:date_issued_start_value',
-        # 'tiInfoTitle'          => 'title-1:title_sort_portion',
+        'tiInfoTitle'          => 'title-1:title_sort_portion',
         'typeResc'             => 'type_of_resource-1:type_of_resource_value',
         'relatedItemSeries:partNumber' => 'series-1:series_number',
         'relatedItemSeries:title' => 'series-1:series_title',
-        'relatedItemSeries:seriesID' => 'series-1:series_is_columbia'
+        'relatedItemSeries:seriesID' => 'series-1:series_is_columbia',
+        'IDidentifierDOI'            => 'parent_publication-1:parent_publication_doi'
       }
 
       def from_actypeunpubitem(export_filepath, import_filepath)
@@ -32,12 +33,21 @@ module HyacinthMapping::TemplateMapping
           copyEmbargo:copyEmNote copyright:accCCStatements copyright:copyCopyNotice copyright:copyCopyStatement
           copyright:copyCopyStatus copyright:copyCountry copyright:copyPubStatus Attachment
           copyright:copyRightsContact copyright:copyRightsName copyright:copyRightsNote copyright:copyYear
-          extAuthorRightsStatement iDIdentifierLocal locURL
+          extAuthorRightsStatement iDIdentifierLocal locURL tableOfContents IDidentifierURI
           nameTypeConference:namePart	nameTypeConference:nameRoleTerm
+          genreGenre-2 genreGenre-3 typeResc-1 typeResc-2 relatedItemSeries:identifierISSN
+          langLanguageTermText-1 langLanguageTermText-2 langLanguageTermText-3
+          physDsInternetMediaType-1 physDsInternetMediaType-2 physDsInternetMediaType-3
+          copyright:copyCopyStatement-1 copyright:copyCopyStatement-2
+          langLanguageTermText-4 langLanguageTermText-5 noteField-2 noteField-3
+          nameTypeConference-1:namePart nameTypeConference-1:namePart-1 nameTypeConference-1:namePart-2
+          nameTypeConference-1:nameRoleTerm nameTypeConference-2:namePart nameTypeConference-2:namePart-1
+          nameTypeConference-2:namePart-2 nameTypeConference-2:namePart-3 nameTypeConference-2:namePart-4
+          nameTypeConference-2:nameRoleTerm nameTypeConference:namePart-1
         })
 
-        # Merge to handle columns
-        # csv.merge_columns("identifier:iDIdentifierHandle", 'iDIdentifierHandle')
+        # Append note columns
+        csv.append_columns('acTypeUnpubItem:noteField', 'acTypeUnpubItem:noteRef', 'acTypeUnpubItem:noteField-1')
 
         # Map corporate names
         corporate_matches = csv.headers.map { |h| /#{PREFIX}:(nameTypeCorporate-?(\d*)):namePart/.match(h) }.compact
@@ -53,6 +63,8 @@ module HyacinthMapping::TemplateMapping
 
           csv.rename_column(name.string, "name-#{num}:name_term.value")
           csv.add_name_type(num: num, type: 'corporate')
+
+          csv.delete_columns(["#{name[1]}:displayForm"])
         end
 
         # Map personal names
@@ -76,25 +88,28 @@ module HyacinthMapping::TemplateMapping
           # Delete extra name columns no longer needed
           # Delete role columns that contain duplicate data in this mapping
           to_delete = [
-            'affilDept', 'affilDept-1', 'affilDept-2', 'affilDept-3', 'namePartGiven', 'affilDept', 'namePartDate',
-            'affilAffiliation:affilAuIDLocal', 'affilAffiliation:affilEmail', 'affilAffiliation:originCountry',
-            'affilAffiliation:affilOrganization', 'affilAffiliation:affilDept', 'affilAffiliation:affilDeptOther',
+            'affilDept', 'affilDept-1', 'affilDept-2', 'affilDept-3', 'affilDept-4', 'namePartGiven', 'affilDept', 'namePartDate',
+            'affilAffiliation:affilAuIDLocal', 'affilAffiliation:affilEmail', 'affilAffiliation:affilEmail-1',
+            'affilAffiliation:affilEmail-2', 'affilAffiliation:affilEmail-3', 'affilAffiliation:originCountry',
+            'affilAffiliation:affilOrganization', 'affilAffiliation:affilDept', 'affilAffiliation:affilDept-1',
+            'affilAffiliation:affilDept-2', 'affilAffiliation:affilDeptOther', 'affilAffiliation:affilDeptOther-1',
+            'affilAffiliation:affilDeptOther-2', 'affilAffiliation:affilDeptOther-3', 'affilAffiliation:affilOrganization',
+            'affilAffiliation:affilOrganization-1', 'affilAffiliation:affilOrganization-2', 'affilAffiliation:affilOrganization-3',
+            'affilAffiliation:affilOrganization-4',
             'affilAffiliation:affilDeptOther-1', 'affilAffiliation:affilAuIDNAF', 'affilAffiliation:affilDeptOther-2',
-            'affiliation', 'nameID', 'affilAffiliation:affilDept-1', 'nameRoleTerm-1'
+            'affiliation', 'nameID', 'affilAffiliation:affilDept-1', 'affilAffiliation:affilDept-2', 'affilAffiliation:affilDept-3',
+            'nameRoleTerm-1'
           ].map { |a| "#{name[1]}:#{a}" }
           csv.delete_columns(to_delete)
         end
 
-        num_sub_topic = csv.headers.select { |h| /^#{PREFIX}:subjectTopic-?(\d*)$/.match(h) }.count
         subject_count = 1
         csv.headers.each do |header|
           no_prefix_header = header.gsub("#{PREFIX}:", '')
 
-          if m = /^(subjectTopicKeyword|subjecTopic|subjectGeoCode)-?\d*$/.match(no_prefix_header)
+          if m = /^(subjectTopicKeyword|subjectTopic|subjectGeoCode)-?\d*$/.match(no_prefix_header)
             csv.rename_column(header, "subject_topic-#{subject_count}:subject_topic_term.value")
             subject_count += 1
-          elsif m = /^subjectTopic-?(\d*)$/.match(no_prefix_header)
-            csv.rename_column(header, "subject_topic-#{m[1].to_i + 1}:subject_topic_term.value")
           elsif MAP[no_prefix_header] # mapping one-to-one fields
             csv.rename_column(header, MAP[no_prefix_header])
           end
@@ -106,6 +121,9 @@ module HyacinthMapping::TemplateMapping
 
         # Map proquest subjects to fast subjects
         csv.map_subjects_to_fast
+
+        # Normalize DOIs
+        csv.normalize_doi('parent_publication-1:parent_publication_doi')
 
         csv.export_to_file
       end

@@ -21,6 +21,7 @@ module HyacinthMapping::TemplateMapping
         'relatedItemSeries:tiInfoTitle' => 'series-1:series_title',
         'tiInfoTitle'          => 'title-1:title_sort_portion',
         'typeResc'             => 'type_of_resource-1:type_of_resource_value',
+        'identifier:IDidentifierDOI' => 'parent_publication-1:parent_publication_doi'
       }
 
       def from_acwp(export_filepath, import_filepath)
@@ -42,14 +43,11 @@ module HyacinthMapping::TemplateMapping
           copyEmbargo:EmPeerReview copyEmbargo:EmRsrcVsbl copyright:copyCopyStatement-1
         })
 
-        # Append title and subtitle
-        csv.append_columns('acWP:tiInfoTitle', 'acWP:tiInfoSubTitle', seperator: ': ')
-
         # Merge to handle columns
         csv.merge_columns("identifier:iDIdentifierHandle", 'iDIdentifierHandle')
 
         # Append note columns
-        csv.append_columns('acWP:noteField', 'acWP:noteField-1', 'noteField-2', 'acWP:noteRef')
+        csv.append_columns('acWP:noteField', 'acWP:noteField-1', 'acWP:noteField-2', 'acWP:noteRef')
 
         # Map corporate names
         corporate_matches = csv.headers.map { |h| /#{PREFIX}:(nameTypeCorporate-?(\d*)):namePart/.match(h) }.compact
@@ -94,8 +92,8 @@ module HyacinthMapping::TemplateMapping
             'affilAffiliation:affilAuIDLocal', 'affilAffiliation:affilEmail', 'affilAffiliation:originCountry',
             'affilAffiliation:affilOrganization', 'affilAffiliation:affilDept', 'affilAffiliation:affilDeptOther',
             'affilAffiliation:affilDeptOther-1', 'affilAffiliation:affilAuIDNAF', 'affilAffiliation:affilDeptOther-2',
-            'affiliation', 'nameID', 'affilAffiliation:affilDept-1', 'nameRoleTerm-1', 'affilAffiliation:affilOrganization-1',
-            'affilAffiliation:affilEmail-1'
+            'affiliation', 'nameID', 'affilAffiliation:affilDept-1', 'affilAffiliation:affilOrganization-1',
+            'affilAffiliation:affilEmail-1', 'nameRoleTerm-1'
           ].map { |a| "#{name[1]}:#{a}" }
           csv.delete_columns(to_delete)
         end
@@ -115,6 +113,9 @@ module HyacinthMapping::TemplateMapping
         # Map role terms from values to uris
         csv.map_values_to_uri('genre-1:genre_term.value', HyacinthMapping::UriMapping::GENRE_MAP)
         csv.map_values_to_uri('language-1:language_term.value', HyacinthMapping::UriMapping::LANGUAGE_MAP)
+
+        # Normalize DOIs
+        csv.normalize_doi('parent_publication-1:parent_publication_doi')
 
         # Map proquest subjects to fast subjects
         csv.map_subjects_to_fast

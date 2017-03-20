@@ -138,6 +138,9 @@ module HyacinthMapping::TemplateMapping
           end
         end
 
+        # Normalize DOIs
+        csv.normalize_doi('parent_publication-1:parent_publication_doi')
+
         # Map role terms from values to uris
         csv.map_values_to_uri('genre-1:genre_term.value', HyacinthMapping::UriMapping::GENRE_MAP)
         csv.map_values_to_uri('language-1:language_term.value', HyacinthMapping::UriMapping::LANGUAGE_MAP)

@@ -125,6 +125,9 @@ module HyacinthMapping::TemplateMapping
         csv.map_values_to_uri("name-1:name_role-1:name_role_term.value", HyacinthMapping::UriMapping::ROLES_MAP)
         csv.map_values_to_uri("name-1:name_role-2:name_role_term.value", HyacinthMapping::UriMapping::ROLES_MAP)
 
+        # Normalize DOIs
+        csv.normalize_doi('parent_publication-1:parent_publication_doi')
+
         # Map proquest subjects to fast subjects
         csv.map_subjects_to_fast
 

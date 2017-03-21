@@ -17,7 +17,7 @@ module HyacinthMapping
         'genre'                    => 'genre-1:genre_term.value',
         'identifierHDL'            => 'cnri_handle_identifier-1:cnri_handle_identifier_value',
         'identifierISBN'           => 'isbn-1:isbn_value',
-        'ezid'                     => 'doi_identifier-1:doi_identifier_value',
+        'ezid'                     => '_doi',
         'language'                 => 'language-1:language_term.value',
         'note'                     => 'note-1:note_value',
         'originInfoDateIssued'     => 'date_issued-1:date_issued_start_value',
@@ -28,6 +28,7 @@ module HyacinthMapping
         'degreeInfo:degreeGrantor' => 'degree-1:degree_grantor',
         'degreeInfo:degreeName'    => 'degree-1:degree_name',
         'embargo:embargoRelease'   => 'embargo_release_date-1:embargo_release_date_value',
+        'tombstone:tombstoneList'  => 'restriction_on_access-1:restriction_on_access_value'
       }
 
       # Map CSV headers from acETD Hypatia csv to Hyacinth compatible csv
@@ -35,13 +36,13 @@ module HyacinthMapping
         csv = HyacinthMapping::CSV.new(export_filepath, import_filepath, prefix: PREFIX)
 
         csv.delete_columns(%w{
-          _hypatia_id copyright:copyrightNotice copyright:creativeCommonsLicense tableOfContents
+          copyright:copyrightNotice copyright:creativeCommonsLicense tableOfContents
           RIOXX:Funder RIOXX:Grant attachment embargo:embargoLength embargo:embargoNote
           embargo:embargoStart
         })
 
         # Merge note columns.
-        csv.merge_columns('note-1', 'note')
+        csv.append_columns('acETD:note', 'acETD:note-1')
 
         # Map personal names
         name_matches = csv.headers.map { |h| /#{PREFIX}:(namePersonal-?(\d*)):namePartFamily/.match(h) }.compact
@@ -110,6 +111,33 @@ module HyacinthMapping
         csv.map_values('degree-1:degree_name', 'degree-1:degree_level', DEGREE_TO_NUM, case_sensitive: true)
         csv.map_values_to_uri('genre-1:genre_term.value', HyacinthMapping::UriMapping::GENRE_MAP)
         csv.map_values_to_uri('language-1:language_term.value', HyacinthMapping::UriMapping::LANGUAGE_MAP)
+
+        # Normalize DOIs
+        csv.normalize_doi('_doi')
+
+        # Add 'doi:' in front of every value in _doi
+        csv.table.each do |row|
+          row['_doi'] = "doi:#{row['_doi']}" unless row['_doi'].blank?
+        end
+
+        # Map degree discipline to department name of first corporate name.
+        csv.add_column('degree-1:degree_discipline')
+        csv.table.each do |row|
+          # pick first corporate name
+          corporates = csv.headers.select do |h|
+            if /name-\d+:name_term.name_type/.match(h)
+              row[h] == 'corporate'
+            else
+              false
+            end
+          end
+          num = corporates.map{ |a| /name-(\d+):name_term.name_type/.match(a)[1].to_i }.min
+
+          corporate_name = row["name-#{num}:name_term.value"].split('.', 2).map(&:strip)
+
+          row['degree-1:degree_grantor'] = corporate_name[0]
+          row['degree-1:degree_discipline'] = corporate_name[1]
+        end
 
         csv.map_subjects_to_fast
 

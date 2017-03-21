@@ -2025,3 +2025,90 @@ africa:
   geographic:
   - label: Africa
     uri: http://id.worldcat.org/fast/1239509
+latino:
+  topic:
+  - label: Hispanic Americans
+    uri: http://id.worldcat.org/fast/957523
+latinos:
+  topic:
+  - label: Hispanic Americans
+    uri: http://id.worldcat.org/fast/957523
+aids:
+  topic:
+  - label: AIDS (Disease)
+    uri: http://id.worldcat.org/fast/793808
+african-american:
+  topic:
+  - label: African Americans
+    uri: http://id.worldcat.org/fast/799558
+african americans:
+  topic:
+  - label: African Americans
+    uri: http://id.worldcat.org/fast/799558
+native americans:
+  topic:
+  - label: Indians of North America
+    uri: http://id.worldcat.org/fast/969633
+women:
+  topic:
+  - label: Women
+    uri: http://id.worldcat.org/fast/1176568
+native americans:
+  topic:
+  - label: Indians of North America
+    uri: http://id.worldcat.org/fast/969633
+native american:
+  topic:
+  - label: Indians of North America
+    uri: http://id.worldcat.org/fast/969633
+citizenship:
+  topic:
+  - label: Citizenship
+    uri: http://id.worldcat.org/fast/861909
+medicaid:
+  topic:
+  - label: Medicaid
+    uri: http://id.worldcat.org/fast/1013657
+islam:
+  topic:
+  - label: Islam
+    uri: http://id.worldcat.org/fast/979776
+immigration:
+  topic:
+  - label: Emigration and immigration
+    uri: http://id.worldcat.org/fast/908690
+christianity:
+  topic:
+  - label: Christianity
+    uri: http://id.worldcat.org/fast/859599
+blacks:
+  topic:
+  - label: Blacks
+    uri: http://id.worldcat.org/fast/833880
+syria:
+  geographic:
+  - label: Syria
+    uri: http://id.worldcat.org/fast/1208757
+egypt:
+  geographic:
+  - label: Egypt
+    uri: http://id.worldcat.org/fast/1208755
+iraq:
+  geographic:
+  - label: Iraq
+    uri: http://id.worldcat.org/fast/1205757
+united states:
+  geographic:
+  - label: United States
+    uri: http://id.worldcat.org/fast/1204155
+palestine:
+  geographic:
+  - label: Middle East--Palestine
+    uri: http://id.worldcat.org/fast/1207534
+united states census:
+  topic:
+  - label: Census
+    uri: http://id.worldcat.org/fast/850587
+  geographic:
+  - label: United States
+    uri: http://id.worldcat.org/fast/1204155

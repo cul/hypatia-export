@@ -173,6 +173,8 @@ module HyacinthMapping
 
       self.table.each do |row|
         topics, geographic_topics = [], []
+
+        # Extract and map all topic subjects
         subject_headers = headers.select { |h| /subject_topic-(\d+):subject_topic_term.value/.match(h) }
         subject_headers.each do |sub_header|
           uri_column = sub_header.gsub('value', 'uri')
@@ -200,6 +202,27 @@ module HyacinthMapping
           row[sub_header] = nil
           row[uri_column] = nil
           row[authority_column] = nil
+        end
+
+        # Extract all fast geographic subjects
+        geographic_headers = headers.select { |h| /subject_geographic-(\d+):subject_geographic_term.value/.match(h) }
+        geographic_headers.each do |geo_header|
+          uri_column = geo_header.gsub('value', 'uri')
+          authority_column = geo_header.gsub('value', 'authority')
+
+          add_column(uri_column)       unless headers.include?(uri_column)
+          add_column(authority_column) unless headers.include?(authority_column)
+
+          subject = row[geo_header]
+          uri = row[uri_column]
+
+          if subject.blank? && uri.blank?
+            next
+          elsif uri.blank?
+            raise "FAST geographic subject with no uri: #{subject}"
+          else
+            geographic_topics.append({ label: subject, uri: uri })
+          end
         end
 
         # Removing duplicates

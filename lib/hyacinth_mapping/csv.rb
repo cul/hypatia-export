@@ -78,6 +78,15 @@ module HyacinthMapping
       delete_columns(columns.drop(1), with_prefix: true)
     end
 
+    # Returns headers of empty columns
+    def empty_columns
+      h = headers.clone
+      table.each do |row|
+        h.reject! { |header| !row[header].blank? }
+      end
+      h
+    end
+
     def map_values_to_uri(value_column, map)
       uri_column = value_column.gsub('value', 'uri')
       authority_column = value_column.gsub('value', 'authority')

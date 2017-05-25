@@ -1,5 +1,6 @@
 require 'csv'
 require 'hypatia_export/values'
+require 'fedora_helper'
 
 module HypatiaExport
   DO_NOT_EXPORT = File.expand_path(File.join('~', 'Google Drive', 'AC4', 'Hypatia to Hyacinth Migration', 'Export CSVs', 'do_not_export.csv'))
@@ -16,6 +17,41 @@ module HypatiaExport
       end
     end
     filename
+  end
+
+  # Find any duplicated pids in exports from hypatia.
+  def self.find_duplicate_pids(csv_filenames)
+    # CSVs need to have a column named _pid
+    all_pids = Hash.new
+
+    csv_filenames.each do |file|
+      CSV.foreach(file, headers: true) do |row|
+        pid = row['_pid']
+        next if pid.blank?
+
+        if all_pids.key?(pid)
+          puts "#{pid} is duplicated"
+          all_pids[pid] += 1
+        else
+          all_pids[pid] = 1
+        end
+      end
+    end
+
+    puts "\n\n"
+
+    # Check that each pid is an aggregator.
+    response = FedoraHelper.riquery('select $aggr from <#ri> where $aggr <rdf:type> <http://purl.oclc.org/NET/CUL/Aggregator>')
+    aggrs = JSON.parse(response.body)['results']
+    aggrs.map! { |a| a['aggr'].gsub('info:fedora/', '') }
+
+    all_pids.keys.each do |pid|
+      unless aggrs.include?(pid)
+        puts "#{pid} is not an aggregator"
+      end
+    end
+
+    puts "\nTotal number of pids: #{all_pids.keys.count}"
   end
 
   def self.export_fields(item_type_id) # Exports all fields for the same ItemType

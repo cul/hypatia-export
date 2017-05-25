@@ -1,55 +1,43 @@
 module HyacinthMapping::TemplateMapping
-  module AcSerialPart
+  module AcMonograph
     def self.included(base)
       base.extend ClassMethods
     end
 
     module ClassMethods
-      PREFIX = 'acSerialPart'
+      PREFIX = 'acMonograph'
       MAP = {
         'abstract'                 => 'abstract-1:abstract_value',
         'genre'                    => 'genre-1:genre_term.value',
         'identifierHDL'            => 'cnri_handle_identifier-1:cnri_handle_identifier_value',
-        'ezid'                     => '_doi',
+        # 'ezid'                     => '_doi',
         'originInfoDateIssued'     => 'date_issued-1:date_issued_start_value',
         'originInfoPlace'          => 'place_of_origin-1:place_of_origin_value',
         'originInfoPublisher'      => 'publisher-1:publisher_value',
         'title'                    => 'title-1:title_sort_portion',
         'note'                     => 'note-1:note_value',
         'typeOfResource'           => 'type_of_resource-1:type_of_resource_value',
-        'originInfoEdition'        => 'edition-1:edition_value',
-        'tombstone:tombstoneList'  => 'restriction_on_access-1:restriction_on_access_value',
-        'relatedItemHost:host_title'          => 'parent_publication-1:parent_publication_title-1:parent_publication_title_sort_portion',
-        'relatedItemHost:identifierDOI'       => 'parent_publication-1:parent_publication_doi',
-        'relatedItemHost:identifierISSN'      => 'parent_publication-1:parent_publication_issn',
-        'relatedItemHost:partDate'            => 'parent_publication-1:parent_publication_date_created_textual',
-        'relatedItemHost:partDetailIssue'     => 'parent_publication-1:parent_publication_issue',
-        'relatedItemHost:partDetailVolume'    => 'parent_publication-1:parent_publication_volume',
-        'relatedItemHost:partExtentPageEnd'   => 'parent_publication-1:parent_publication_page_end',
-        'relatedItemHost:partExtentPageStart' => 'parent_publication-1:parent_publication_page_start',
+        # 'originInfoEdition'        => 'edition-1:edition_value',
+        # 'tombstone:tombstoneList'  => 'restriction_on_access-1:restriction_on_access_value',
+        # 'relatedItemHost:host_title'          => 'parent_publication-1:parent_publication_title-1:parent_publication_title_sort_portion',
+        # 'relatedItemHost:identifierDOI'       => 'parent_publication-1:parent_publication_doi',
+        # 'relatedItemHost:identifierISSN'      => 'parent_publication-1:parent_publication_issn',
+        # 'relatedItemHost:partDate'            => 'parent_publication-1:parent_publication_date_created_textual',
+        # 'relatedItemHost:partDetailIssue'     => 'parent_publication-1:parent_publication_issue',
+        # 'relatedItemHost:partDetailVolume'    => 'parent_publication-1:parent_publication_volume',
+        # 'relatedItemHost:partExtentPageEnd'   => 'parent_publication-1:parent_publication_page_end',
+        # 'relatedItemHost:partExtentPageStart' => 'parent_publication-1:parent_publication_page_start',
       }
 
       def from_acserialpart(export_filepath, import_filepath)
         csv = HyacinthMapping::CSV.new(export_filepath, import_filepath, prefix: PREFIX)
 
         csv.delete_columns(%w{
-          tableOfContents attachment RIOXX:Funder RIOXX:Grant RIOXX-3:Grant RIOXX-4:Funder
-          copyright-1:copyrightNotice copyright-1:creativeCommonsLicense copyright:copyrightNotice
-          copyright:creativeCommonsLicense RIOXX-1:Funder RIOXX-2:Funder RIOXX-3:Funder
-          RIOXX-1:Grant RIOXX-2:Grant RIOXX-4:Grant RIOXX-10:Funder RIOXX-10:Grant
-          RIOXX-11:Funder	RIOXX-11:Grant	RIOXX-12:Funder	RIOXX-12:Grant RIOXX-13:Funder
-          RIOXX-14:Funder RIOXX-15:Funder RIOXX-15:Grant RIOXX-16:Funder	RIOXX-17:Funder
-          RIOXX-18:Funder RIOXX-19:Funder RIOXX-20:Funder RIOXX-21:Funder RIOXX-22:Funder
-          RIOXX-23:Funder RIOXX-24:Funder RIOXX-25:Funder RIOXX-26:Funder RIOXX-27:Funder
-          RIOXX-28:Funder RIOXX-29:Funder RIOXX-30:Funder	RIOXX-31:Funder RIOXX-32:Funder
-          RIOXX-33:Funder	RIOXX-34:Funder RIOXX-35:Funder RIOXX-36:Funder RIOXX-37:Funder
-          RIOXX-38:Funder RIOXX-39:Funder RIOXX-40:Funder RIOXX-41:Funder RIOXX-5:Funder
-          RIOXX-5:Grant RIOXX-6:Funder RIOXX-6:Grant RIOXX-7:Funder RIOXX-7:Grant
-          RIOXX-8:Funder RIOXX-9:Funder RIOXX-9:Grant
+          tableOfContents RIOXX:Funder RIOXX:Grant attachment attachment-1
         })
 
         # Merge note columns.
-        csv.append_columns('acSerialPart:note', 'acSerialPart:note-1')
+        csv.append_columns('acMonograph:note', 'acMonograph:note-1')
 
         # Map personal names
         name_matches = csv.headers.map { |h| /^#{PREFIX}:(namePersonal-?(\d*)):namePartFamily$/.match(h) }.compact
@@ -106,10 +94,10 @@ module HyacinthMapping::TemplateMapping
                      elsif m = /^subject-?(\d*)$/.match(no_prefix_header)
                        num = m[1].to_i + 1 + num_fast
                        "subject_topic-#{num}:subject_topic_term.value"
-                     elsif m = /^FASTGeo-?(\d*):GeoURI$/.match(no_prefix_header)
-                       "subject_geographic-#{m[1].to_i + 1}:subject_geographic_term.uri"
-                     elsif m = /^FASTGeo-?(\d*):Geo$/.match(no_prefix_header)
-                       "subject_geographic-#{m[1].to_i + 1}:subject_geographic_term.value"
+                    #  elsif m = /^FASTGeo-?(\d*):GeoURI$/.match(no_prefix_header)
+                    #    "subject_geographic-#{m[1].to_i + 1}:subject_geographic_term.uri"
+                    #  elsif m = /^FASTGeo-?(\d*):Geo$/.match(no_prefix_header)
+                    #    "subject_geographic-#{m[1].to_i + 1}:subject_geographic_term.value"
                      elsif m = /^language-?(\d*)/.match(no_prefix_header)
                        "language-#{m[1].to_i + 1}:language_term.value"
                      elsif MAP[no_prefix_header] # mapping one-to-one fields
@@ -128,13 +116,13 @@ module HyacinthMapping::TemplateMapping
         end
 
         # Normalize DOIs
-        csv.normalize_doi('_doi')
-        csv.normalize_doi('parent_publication-1:parent_publication_doi')
+        # csv.normalize_doi('_doi')
+        # csv.normalize_doi('parent_publication-1:parent_publication_doi')
 
         # Add 'doi:' in front of every value in _doi
-        csv.table.each do |row|
-          row['_doi'] = "doi:#{row['_doi']}" unless row['_doi'].blank?
-        end
+        # csv.table.each do |row|
+        #   row['_doi'] = "doi:#{row['_doi']}" unless row['_doi'].blank?
+        # end
 
         csv.map_subjects_to_fast
 

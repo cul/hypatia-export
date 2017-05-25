@@ -37,7 +37,8 @@ module HyacinthMapping
 
         csv.delete_columns(%w{
           copyright:copyrightNotice copyright:creativeCommonsLicense tableOfContents
-          RIOXX:Funder RIOXX:Grant attachment embargo:embargoLength embargo:embargoNote
+          RIOXX:Funder RIOXX:Grant attachment attachment-1 attachment-2 attachment-3
+          embargo:embargoLength embargo:embargoNote
           embargo:embargoStart
         })
 

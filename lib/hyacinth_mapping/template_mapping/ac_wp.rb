@@ -31,7 +31,7 @@ module HyacinthMapping::TemplateMapping
           Attachment locURL originCity originPlace:originCity originPlace:originCountry
           originPlace:originState copyEmbargo:copyEmAccessLevel copyEmbargo:copyEmDateBegin
           copyEmbargo:copyEmDateEnd copyEmbargo:copyEmIssuedBy copyEmbargo:copyEmNote
-          copyEmbargo:EmPeerReview
+          copyEmbargo:EmPeerReview nameTypeCorporate:namePart-1
           copyright:accCCStatements copyright:copyCopyNotice copyright:copyCopyStatement
           copyright:copyCopyStatus copyright:copyCountry copyright:copyPubStatus
           copyright:copyRightsContact copyright:copyRightsName copyright:copyRightsNote
@@ -51,6 +51,7 @@ module HyacinthMapping::TemplateMapping
 
         # Map corporate names
         corporate_matches = csv.headers.map { |h| /#{PREFIX}:(nameTypeCorporate-?(\d*)):namePart/.match(h) }.compact
+        puts corporate_matches.map(&:string).to_s
         corporate_matches.each do |name|
           num = name[2].to_i + 1
 

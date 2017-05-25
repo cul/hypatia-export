@@ -19,16 +19,10 @@ namespace :hyacinth do
   end
 
   task :create_many_csvs => :environment do
-    [ 'acTypeBookChapter10',
-      'acWP10',
-      'acTypeAV',
-      'acTypeUnpubItem10',
-      'acTypeBookChapter',
-      'acDissertation',
-      'acTypeBook',
-      'acPubArticle'
-    ].each do |code|
-      ENV['item_type_code'] = code
+    (1..19).each do |num|
+      ENV['item_type_code'] = 'acSerialPart'
+      ENV['filename'] = "acSerialPart-#{num}-export-from-hypatia.csv"
+      puts "acSerialPart-#{num}-export-from-hypatia.csv"
       Rake::Task['hyacinth:create_csv_for'].execute
     end
   end
@@ -86,6 +80,11 @@ namespace :hyacinth do
       ri_query = "select $member $title from <#ri> where $member <http://purl.oclc.org/NET/CUL/memberOf> <fedora:#{agr_pid}> and $member <info:fedora/fedora-system:def/model#label> $title"
       response = repo.risearch(ri_query, format: 'json', lang: 'itql')
       assets = JSON.parse(response.body)['results']
+
+      if assets.blank? || assets.count.zero?
+        puts "WARN: #{agr_pid} does not have any assets."
+      end
+
       assets.each do |asset|
         pid = asset['member'].gsub('info:fedora/', '')
         title = asset['title']
@@ -93,7 +92,7 @@ namespace :hyacinth do
       end
     end
 
-    asset_csv = aggregator_csv.sub('hyacinth-import-for-review', 'asset-to-aggregators')
+    asset_csv = aggregator_csv.sub('hyacinth-import', 'asset-to-aggregators')
 
     # Create aggregator to asset csv.
     CSV.open(asset_csv, "w") do |csv|

@@ -10,30 +10,29 @@ module HyacinthMapping::TemplateMapping
         'abstract'                 => 'abstract-1:abstract_value',
         'genre'                    => 'genre-1:genre_term.value',
         'identifierHDL'            => 'cnri_handle_identifier-1:cnri_handle_identifier_value',
-        # 'ezid'                     => '_doi',
+        'ezid'                     => '_doi',
         'originInfoDateIssued'     => 'date_issued-1:date_issued_start_value',
         'originInfoPlace'          => 'place_of_origin-1:place_of_origin_value',
         'originInfoPublisher'      => 'publisher-1:publisher_value',
         'title'                    => 'title-1:title_sort_portion',
         'note'                     => 'note-1:note_value',
         'typeOfResource'           => 'type_of_resource-1:type_of_resource_value',
-        # 'originInfoEdition'        => 'edition-1:edition_value',
-        # 'tombstone:tombstoneList'  => 'restriction_on_access-1:restriction_on_access_value',
-        # 'relatedItemHost:host_title'          => 'parent_publication-1:parent_publication_title-1:parent_publication_title_sort_portion',
-        # 'relatedItemHost:identifierDOI'       => 'parent_publication-1:parent_publication_doi',
-        # 'relatedItemHost:identifierISSN'      => 'parent_publication-1:parent_publication_issn',
-        # 'relatedItemHost:partDate'            => 'parent_publication-1:parent_publication_date_created_textual',
-        # 'relatedItemHost:partDetailIssue'     => 'parent_publication-1:parent_publication_issue',
-        # 'relatedItemHost:partDetailVolume'    => 'parent_publication-1:parent_publication_volume',
-        # 'relatedItemHost:partExtentPageEnd'   => 'parent_publication-1:parent_publication_page_end',
-        # 'relatedItemHost:partExtentPageStart' => 'parent_publication-1:parent_publication_page_start',
+        'embargo:embargoRelease'   => 'embargo_release_date-1:embargo_release_date_value',
+        'identifierISBN'           => 'isbn-1:isbn_value',
+        'tombstone:tombstoneList'  => 'restriction_on_access-1:restriction_on_access_value',
+        'relatedItemSeries:partNumber'                => 'series-1:series_number',
+        'relatedItemSeries:related_item_series_title' => 'series-1:series_title',
+        'relatedItemSeries:seriesID'                  => 'series-1:series_is_columbia',
+        'relatedItemSeries:identifierISSN'            => 'series-1:series_issn',
+        'identifierDOI'                               => 'parent_publication-1:parent_publication_doi',
       }
 
-      def from_acserialpart(export_filepath, import_filepath)
+      def from_acmonograph(export_filepath, import_filepath)
         csv = HyacinthMapping::CSV.new(export_filepath, import_filepath, prefix: PREFIX)
 
         csv.delete_columns(%w{
           tableOfContents RIOXX:Funder RIOXX:Grant attachment attachment-1
+          physicalDescription:extent physicalDescription:internetMediaType
         })
 
         # Merge note columns.
@@ -94,10 +93,10 @@ module HyacinthMapping::TemplateMapping
                      elsif m = /^subject-?(\d*)$/.match(no_prefix_header)
                        num = m[1].to_i + 1 + num_fast
                        "subject_topic-#{num}:subject_topic_term.value"
-                    #  elsif m = /^FASTGeo-?(\d*):GeoURI$/.match(no_prefix_header)
-                    #    "subject_geographic-#{m[1].to_i + 1}:subject_geographic_term.uri"
-                    #  elsif m = /^FASTGeo-?(\d*):Geo$/.match(no_prefix_header)
-                    #    "subject_geographic-#{m[1].to_i + 1}:subject_geographic_term.value"
+                     elsif m = /^FASTGeo-?(\d*):GeoURI$/.match(no_prefix_header)
+                       "subject_geographic-#{m[1].to_i + 1}:subject_geographic_term.uri"
+                     elsif m = /^FASTGeo-?(\d*):Geo$/.match(no_prefix_header)
+                       "subject_geographic-#{m[1].to_i + 1}:subject_geographic_term.value"
                      elsif m = /^language-?(\d*)/.match(no_prefix_header)
                        "language-#{m[1].to_i + 1}:language_term.value"
                      elsif MAP[no_prefix_header] # mapping one-to-one fields
@@ -116,13 +115,13 @@ module HyacinthMapping::TemplateMapping
         end
 
         # Normalize DOIs
-        # csv.normalize_doi('_doi')
-        # csv.normalize_doi('parent_publication-1:parent_publication_doi')
+        csv.normalize_doi('_doi')
+        csv.normalize_doi('parent_publication-1:parent_publication_doi')
 
         # Add 'doi:' in front of every value in _doi
-        # csv.table.each do |row|
-        #   row['_doi'] = "doi:#{row['_doi']}" unless row['_doi'].blank?
-        # end
+        csv.table.each do |row|
+          row['_doi'] = "doi:#{row['_doi']}" unless row['_doi'].blank?
+        end
 
         csv.map_subjects_to_fast
 

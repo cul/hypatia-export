@@ -15,4 +15,5 @@ module HyacinthMapping
   include TemplateMapping::AcPubArticle
   include TemplateMapping::AcWp
   include TemplateMapping::AcTypeUnpubItem
+  include TemplateMapping::AcMonograph
 end

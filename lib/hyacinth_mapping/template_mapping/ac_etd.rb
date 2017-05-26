@@ -46,14 +46,14 @@ module HyacinthMapping
         csv.append_columns('acETD:note', 'acETD:note-1')
 
         # Map personal names
-        name_matches = csv.headers.map { |h| /#{PREFIX}:(namePersonal-?(\d*)):namePartFamily/.match(h) }.compact
+        name_matches = csv.headers.map { |h| /^#{PREFIX}:(namePersonal-?(\d*)):namePartFamily$/.match(h) }.compact
         name_matches.each do |name|
           csv.combine_name("#{PREFIX}:#{name[1]}:namePartGiven", "#{PREFIX}:#{name[1]}:namePartFamily")
 
           num = name[2].to_i + 1
 
           # Rename all role row columns
-          role_match = csv.headers.map { |h| /#{PREFIX}:#{name[1]}:role-?(\d*)/.match(h) }.compact
+          role_match = csv.headers.map { |h| /^#{PREFIX}:#{name[1]}:role-?(\d*)$/.match(h) }.compact
           role_match.each do |role|
             new_column = "name-#{num}:name_role-#{role[1].to_i + 1}:name_role_term.value"
             csv.rename_column(role.string, "name-#{num}:name_role-#{role[1].to_i + 1}:name_role_term.value")
@@ -72,11 +72,11 @@ module HyacinthMapping
         end
 
         # Map corporate names
-        corporate_matches = csv.headers.map { |h| /#{PREFIX}:(nameCorporate-?(\d*)):namePart/.match(h) }.compact
+        corporate_matches = csv.headers.map { |h| /^#{PREFIX}:(nameCorporate-?(\d*)):namePart$/.match(h) }.compact
         corporate_matches.each do |name|
           num = name_matches.count + name[2].to_i + 1
 
-          role_match = csv.headers.map { |h| /#{PREFIX}:#{name[1]}:role-?(\d*)/.match(h) }.compact
+          role_match = csv.headers.map { |h| /^#{PREFIX}:#{name[1]}:role-?(\d*)$/.match(h) }.compact
           role_match.each do |role|
             new_column = "name-#{num}:name_role-#{role[1].to_i + 1}:name_role_term.value"
             csv.rename_column(role.string, "name-#{num}:name_role-#{role[1].to_i + 1}:name_role_term.value")
@@ -88,7 +88,7 @@ module HyacinthMapping
         end
 
         # Mapping rest of columns
-        num_fast = csv.headers.select{ |h| /#{PREFIX}:FAST-?(\d+)?:FASTURI/.match(h) }.count
+        num_fast = csv.headers.select{ |h| /^#{PREFIX}:FAST-?(\d+)?:FASTURI$/.match(h) }.count
         csv.headers.each do |header|
           no_prefix_header = header.gsub("#{PREFIX}:", '')
 
@@ -141,6 +141,15 @@ module HyacinthMapping
         end
 
         csv.map_subjects_to_fast
+
+        # Check for empty columns
+        empty_columns = csv.empty_columns
+
+        # Delete blank columns that start with the template prefix.
+        # These are columns we don't need to bother mapping anyways.
+        blank_columns = empty_columns.grep(/^#{PREFIX}:.+$/)
+        puts "Empty columns to be removed: \n#{blank_columns.join("\n")}\n\n" unless blank_columns.empty?
+        csv.delete_columns(blank_columns, with_prefix: true)
 
         csv.export_to_file
       end

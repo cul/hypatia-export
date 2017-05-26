@@ -18,6 +18,7 @@ module HyacinthMapping::TemplateMapping
         'note'                     => 'note-1:note_value',
         'typeOfResource'           => 'type_of_resource-1:type_of_resource_value',
         'originInfoEdition'        => 'edition-1:edition_value',
+        'embargo:embargoRelease'   => 'embargo_release_date-1:embargo_release_date_value',
         'tombstone:tombstoneList'  => 'restriction_on_access-1:restriction_on_access_value',
         'relatedItemHost:host_title'          => 'parent_publication-1:parent_publication_title-1:parent_publication_title_sort_portion',
         'relatedItemHost:identifierDOI'       => 'parent_publication-1:parent_publication_doi',
@@ -45,7 +46,8 @@ module HyacinthMapping::TemplateMapping
           RIOXX-33:Funder	RIOXX-34:Funder RIOXX-35:Funder RIOXX-36:Funder RIOXX-37:Funder
           RIOXX-38:Funder RIOXX-39:Funder RIOXX-40:Funder RIOXX-41:Funder RIOXX-5:Funder
           RIOXX-5:Grant RIOXX-6:Funder RIOXX-6:Grant RIOXX-7:Funder RIOXX-7:Grant
-          RIOXX-8:Funder RIOXX-9:Funder RIOXX-9:Grant
+          RIOXX-8:Funder RIOXX-9:Funder RIOXX-9:Grant RIOXX-14:Grant RIOXX-17:Grant
+          relatedItemHost:copyrightNotice
         })
 
         # Merge note columns.

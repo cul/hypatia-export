@@ -184,7 +184,7 @@ module HyacinthMapping
         topics, geographic_topics = [], []
 
         # Extract and map all topic subjects
-        subject_headers = headers.select { |h| /subject_topic-(\d+):subject_topic_term.value/.match(h) }
+        subject_headers = headers.select { |h| /^subject_topic-(\d+):subject_topic_term.value$/.match(h) }
         subject_headers.each do |sub_header|
           uri_column = sub_header.gsub('value', 'uri')
           authority_column = sub_header.gsub('value', 'authority')
@@ -214,7 +214,7 @@ module HyacinthMapping
         end
 
         # Extract all fast geographic subjects
-        geographic_headers = headers.select { |h| /subject_geographic-(\d+):subject_geographic_term.value/.match(h) }
+        geographic_headers = headers.select { |h| /^subject_geographic-(\d+):subject_geographic_term.value$/.match(h) }
         geographic_headers.each do |geo_header|
           uri_column = geo_header.gsub('value', 'uri')
           authority_column = geo_header.gsub('value', 'authority')
@@ -232,14 +232,18 @@ module HyacinthMapping
           else
             geographic_topics.append({ label: subject, uri: uri })
           end
+
+          row[geo_header] = nil
+          row[uri_column] = nil
+          row[authority_column] = nil
         end
 
         # Removing duplicates
-        topics.uniq! { |t| t[:uri] || t[:label]}
-        geographic_topics.uniq! { |t| t[:uri] || t[:label]}
+        topics.uniq! { |t| t[:uri] || t[:label] }
+        geographic_topics.uniq! { |t| t[:uri] || t[:label] }
 
         # Get all empty geographic headers and make new columns if necessary
-        geographic_headers = headers.select { |h| /subject_geographic-(\d+):subject_geographic_term.value/.match(h) }
+        geographic_headers = headers.select { |h| /^subject_geographic-(\d+):subject_geographic_term.value$/.match(h) }
         empty = geographic_headers.select { |h| row[h].blank? and row[h.gsub('value', 'uri')].blank? }
         if geographic_topics.size > empty.size # make new rows
           num = geographic_topics.size - empty.size

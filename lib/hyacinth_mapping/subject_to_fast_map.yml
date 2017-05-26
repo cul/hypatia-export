@@ -2112,3 +2112,225 @@ united states census:
   geographic:
   - label: United States
     uri: http://id.worldcat.org/fast/1204155
+quantitative psychology:
+  topic:
+  - label: Psychometrics
+    uri: http://id.worldcat.org/fast/1081639
+systems science:
+  topic:
+  - label: System theory
+    uri: http://id.worldcat.org/fast/1141423
+transportation:
+  topic:
+  - label: Transportation
+    uri: http://id.worldcat.org/fast/1155007
+islamic studies:
+  topic:
+  - label: Islam--Study and teaching
+    uri: http://id.worldcat.org/fast/979852
+education history:
+  topic:
+  - label: Education
+    uri: http://id.worldcat.org/fast/902499
+neurology:
+  topic:
+  - label: Neurology
+    uri: http://id.worldcat.org/fast/1036390
+psychiatry:
+  topic:
+  - label: Psychiatry
+    uri: http://id.worldcat.org/fast/1081152
+poetry:
+  topic:
+  - label: Poetry
+    uri: http://id.worldcat.org/fast/1067691
+mental illness:
+  topic:
+  - label: Mental illness
+    uri: http://id.worldcat.org/fast/1016547
+public health occupations:
+  topic:
+  - label: Public health personnel
+    uri: http://id.worldcat.org/fast/1082397
+clinical psychiatry:
+  topic:
+  - label: Psychiatry
+    uri: http://id.worldcat.org/fast/1081152
+anesthesiology:
+  topic:
+  - label: Anesthesiology
+    uri: http://id.worldcat.org/fast/808683
+philology:
+  topic:
+  - label: Philology
+    uri: http://id.worldcat.org/fast/1060694
+radiotherapy:
+  topic:
+  - label: Radiotherapy
+    uri: http://id.worldcat.org/fast/1088351
+french language:
+  topic:
+  - label: French language
+    uri: http://id.worldcat.org/fast/934333
+education technology:
+  topic:
+  - label: Educational technology
+    uri: http://id.worldcat.org/fast/903623
+hydrologic studies:
+  topic:
+  - label: Hydrology
+    uri: http://id.worldcat.org/fast/965147
+genomics:
+  topic:
+  - label: Genomics
+    uri: http://id.worldcat.org/fast/940228
+environmental sciences:
+  topic:
+  - label: Environmental sciences
+    uri: http://id.worldcat.org/fast/913474
+dermatology:
+  topic:
+  - label: Dermatology
+    uri: http://id.worldcat.org/fast/891059
+child development:
+  topic:
+  - label: Child development
+    uri: http://id.worldcat.org/fast/854393
+medical care--evaluation:
+  topic:
+  - label: Medical care--Evaluation
+    uri: http://id.worldcat.org/fast/1013794
+career development:
+  topic:
+  - label: Career development
+    uri: http://id.worldcat.org/fast/847280
+cardiovascular system:
+  topic:
+  - label: Cardiovascular system
+    uri: http://id.worldcat.org/fast/847172
+cardiology:
+  topic:
+  - label: Cardiology
+    uri: http://id.worldcat.org/fast/847121
+health behavior:
+  topic:
+  - label: Health behavior
+    uri: http://id.worldcat.org/fast/952816
+language acquisition:
+  topic:
+  - label: Language acquisition
+    uri: http://id.worldcat.org/fast/992119
+medical care:
+  topic:
+  - label: Medical care
+    uri: http://id.worldcat.org/fast/1013753
+computer software--development:
+  topic:
+  - label: Computer software--Development
+    uri: http://id.worldcat.org/fast/872537
+sustainable development:
+  topic:
+  - label: Sustainable development
+    uri: http://id.worldcat.org/fast/1139731
+cultural anthropology, health sciences, social research:
+  topic:
+  - label: Ethnology
+    uri: http://id.worldcat.org/fast/916106
+  - label: Medical sciences
+    uri: http://id.worldcat.org/fast/1014601
+  - label: Social sciences--Research
+    uri: http://id.worldcat.org/fast/1122944
+education administration:
+  topic:
+  - label: School management and organization
+    uri: http://id.worldcat.org/fast/1107575
+commerce-business:
+  topic:
+  - label: Commerce
+    uri: http://id.worldcat.org/fast/869279
+japan--economic conditions:
+  topic:
+  - label: Economics
+    uri: http://id.worldcat.org/fast/902116
+  geographic:
+  - label: Japan
+    uri: http://id.worldcat.org/fast/1204082
+pacific area--economic conditions:
+  topic:
+  - label: Economics
+    uri: http://id.worldcat.org/fast/902116
+  geographic:
+  - label: Pacific Area
+    uri: http://id.worldcat.org/fast/1243504
+economics--japan:
+  topic:
+  - label: Economics
+    uri: http://id.worldcat.org/fast/902116
+  geographic:
+  - label: Japan
+    uri: http://id.worldcat.org/fast/1204082
+united states--relations--japan:
+  topic:
+  - label: International relations
+    uri: http://id.worldcat.org/fast/977053
+  geographic:
+  - label: Japan
+    uri: http://id.worldcat.org/fast/1204082
+japan--relations--united states:
+  topic:
+  - label: International relations
+    uri: http://id.worldcat.org/fast/977053
+  geographic:
+  - label: Japan
+    uri: http://id.worldcat.org/fast/1204082
+japan--foreign economic relations--pacific area:
+  topic:
+  - label: International economic relations
+    uri: http://id.worldcat.org/fast/976891
+  geographic:
+  - label: Japan
+    uri: http://id.worldcat.org/fast/1204082
+economics--united states:
+  topic:
+  - label: Economics
+    uri: http://id.worldcat.org/fast/902116
+  geographic:
+  - label: United States
+    uri: http://id.worldcat.org/fast/1204155
+management--japan:
+  topic:
+  - label: Management
+    uri: http://id.worldcat.org/fast/1007141
+  geographic:
+  - label: Japan
+    uri: http://id.worldcat.org/fast/1204082
+business--united states:
+  topic:
+  - label: Business
+    uri: http://id.worldcat.org/fast/842262
+  geographic:
+  - label: United States
+    uri: http://id.worldcat.org/fast/1204155
+neuroscience:
+  topic:
+  - label: Neurosciences
+    uri: http://id.worldcat.org/fast/1036509
+radiology:
+  topic:
+  - label: Medical radiology
+    uri: http://id.worldcat.org/fast/1088281
+united states--commerce:
+  topic:
+  - label: Commerce
+    uri: http://id.worldcat.org/fast/869279
+  geographic:
+  - label: United States
+    uri: http://id.worldcat.org/fast/1204155
+international economic relations:
+  topic:
+  - label: International economic relations
+    uri: http://id.worldcat.org/fast/976891
+organizational psychology:
+  topic:
+  - label: Psychology, Industrial
+    uri: http://id.worldcat.org/fast/1081592

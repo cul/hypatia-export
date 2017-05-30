@@ -47,7 +47,9 @@ module HyacinthMapping::TemplateMapping
           RIOXX-38:Funder RIOXX-39:Funder RIOXX-40:Funder RIOXX-41:Funder RIOXX-5:Funder
           RIOXX-5:Grant RIOXX-6:Funder RIOXX-6:Grant RIOXX-7:Funder RIOXX-7:Grant
           RIOXX-8:Funder RIOXX-9:Funder RIOXX-9:Grant RIOXX-14:Grant RIOXX-17:Grant
-          relatedItemHost:copyrightNotice
+          relatedItemHost:copyrightNotice relatedItemHost:copyrightNotice
+          RIOXX-13:Grant RIOXX-16:Grant RIOXX-8:Grant
+          embargo:embargoLength embargo:embargoNote embargo:embargoStart
         })
 
         # Merge note columns.
@@ -91,7 +93,6 @@ module HyacinthMapping::TemplateMapping
             csv.map_values_to_uri(new_column, HyacinthMapping::UriMapping::ROLES_MAP)
           end
 
-          csv.merge_columns("#{PREFIX}:#{name[1]}:namePartSelect", name.string)
           csv.rename_column(name.string, "name-#{num}:name_term.value")
           csv.add_name_type(num: num, type: 'corporate')
         end
@@ -112,7 +113,7 @@ module HyacinthMapping::TemplateMapping
                        "subject_geographic-#{m[1].to_i + 1}:subject_geographic_term.uri"
                      elsif m = /^FASTGeo-?(\d*):Geo$/.match(no_prefix_header)
                        "subject_geographic-#{m[1].to_i + 1}:subject_geographic_term.value"
-                     elsif m = /^language-?(\d*)/.match(no_prefix_header)
+                     elsif m = /^language-?(\d*)$/.match(no_prefix_header)
                        "language-#{m[1].to_i + 1}:language_term.value"
                      elsif MAP[no_prefix_header] # mapping one-to-one fields
                        MAP[no_prefix_header]

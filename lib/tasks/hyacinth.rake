@@ -20,25 +20,20 @@ namespace :hyacinth do
 
   task :create_many_csvs => :environment do
     (1..19).each do |num|
+      filename = "acSerialPart-#{num}-export-from-hypatia.csv"
       ENV['item_type_code'] = 'acSerialPart'
-      ENV['filename'] = "acSerialPart-#{num}-export-from-hypatia.csv"
-      puts "acSerialPart-#{num}-export-from-hypatia.csv"
+      ENV['filename'] = filename
+      puts Rainbow(filename).cyan
       Rake::Task['hyacinth:create_csv_for'].execute
     end
 
-    # (1..12).each do |num|
-    #   ENV['item_type_code'] = 'acMonograph'
-    #   ENV['filename'] = "acMonograph-#{num}-export-from-hypatia.csv"
-    #   puts "acMonograph-#{num}-export-from-hypatia.csv"
-    #   Rake::Task['hyacinth:create_csv_for'].execute
-    # end
-
-    # (1..9).each do |num|
-    #   ENV['item_type_code'] = 'acETD'
-    #   ENV['filename'] = "acETD-#{num}-export-from-hypatia.csv"
-    #   puts "acETD-#{num}-export-from-hypatia.csv"
-    #   Rake::Task['hyacinth:create_csv_for'].execute
-    # end
+    (1..12).each do |num|
+      filename = "acMonograph-#{num}-export-from-hypatia.csv"
+      ENV['item_type_code'] = 'acMonograph'
+      ENV['filename'] = filename
+      puts Rainbow(filename).cyan
+      Rake::Task['hyacinth:create_csv_for'].execute
+    end
   end
 
   task :decode_html_entities do

@@ -1,11 +1,11 @@
 module HyacinthMapping::TemplateMapping
-  module AcMonograph
+  module AcWebpagePart
     def self.included(base)
       base.extend ClassMethods
     end
 
     module ClassMethods
-      PREFIX = 'acMonograph'
+      PREFIX = 'acWebpagePart'
       MAP = {
         'abstract'                 => 'abstract-1:abstract_value',
         'genre'                    => 'genre-1:genre_term.value',
@@ -17,28 +17,17 @@ module HyacinthMapping::TemplateMapping
         'title'                    => 'title-1:title_sort_portion',
         'note'                     => 'note-1:note_value',
         'typeOfResource'           => 'type_of_resource-1:type_of_resource_value',
-        'embargo:embargoRelease'   => 'embargo_release_date-1:embargo_release_date_value',
-        'identifierISBN'           => 'isbn-1:isbn_value',
-        'tombstone:tombstoneList'  => 'restriction_on_access-1:restriction_on_access_value',
-        'relatedItemSeries:partNumber'                => 'series-1:series_number',
-        'relatedItemSeries:related_item_series_title' => 'series-1:series_title',
-        'relatedItemSeries:seriesID'                  => 'series-1:series_is_columbia',
-        'relatedItemSeries:identifierISSN'            => 'series-1:series_issn',
-        'identifierDOI'                               => 'parent_publication-1:parent_publication_doi',
-        'relateditemOtherVersion:relatedItemHost:identifierISBN' => 'parent_publication-1:parent_publication_isbn',
-        'relateditemOtherVersion:relatedItemHost:originInfoDateIssued' => 'parent_publication-1:parent_publication_date_created_textual'
+        'originInfoEdition'        => 'edition-1:edition_value',
+        'relatedItemHost:host_title'           => 'parent_publication-1:parent_publication_title-1:parent_publication_title_sort_portion',
+        'relatedItemHost:identifierURI'        => 'parent_publication-1:parent_publication_uri',
+        'relatedItemHost:originInfoDateIssued' => 'parent_publication-1:parent_publication_date_created_textual',
       }
 
-      def from_acmonograph(export_filepath, import_filepath)
+      def from_acwebpagepart(export_filepath, import_filepath)
         csv = HyacinthMapping::CSV.new(export_filepath, import_filepath, prefix: PREFIX)
 
         csv.delete_columns(%w{
-          tableOfContents RIOXX:Funder RIOXX:Grant attachment attachment-1
-          physicalDescription:extent physicalDescription:internetMediaType
         })
-
-        # Merge note columns.
-        csv.append_columns('acMonograph:note', 'acMonograph:note-1')
 
         # Map personal names
         name_matches = csv.headers.map { |h| /^#{PREFIX}:(namePersonal-?(\d*)):namePartFamily$/.match(h) }.compact
@@ -94,10 +83,6 @@ module HyacinthMapping::TemplateMapping
                      elsif m = /^subject-?(\d*)$/.match(no_prefix_header)
                        num = m[1].to_i + 1 + num_fast
                        "subject_topic-#{num}:subject_topic_term.value"
-                     elsif m = /^FASTGeo-?(\d*):GeoURI$/.match(no_prefix_header)
-                       "subject_geographic-#{m[1].to_i + 1}:subject_geographic_term.uri"
-                     elsif m = /^FASTGeo-?(\d*):Geo$/.match(no_prefix_header)
-                       "subject_geographic-#{m[1].to_i + 1}:subject_geographic_term.value"
                      elsif m = /^language-?(\d*)$/.match(no_prefix_header)
                        "language-#{m[1].to_i + 1}:language_term.value"
                      elsif MAP[no_prefix_header] # mapping one-to-one fields
@@ -117,7 +102,6 @@ module HyacinthMapping::TemplateMapping
 
         # Normalize DOIs
         csv.normalize_doi('_doi')
-        csv.normalize_doi('parent_publication-1:parent_publication_doi')
 
         # Add 'doi:' in front of every value in _doi
         csv.table.each do |row|

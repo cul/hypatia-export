@@ -55,6 +55,43 @@ module HyacinthMapping::TemplateMapping
         # Merge note columns.
         csv.append_columns('acSerialPart:note', 'acSerialPart:note-1')
 
+        # Split up corporate names, if they have multiple part
+        total_corporate_names = csv.headers.grep(/^#{PREFIX}:nameCorporate-?\d*:namePart-?\d*$/).count
+        puts "#{total_corporate_names}"
+
+        raise "Could not find any corporate names" if total_corporate_names.zero?
+
+        corp_multi_part = csv.headers.map { |h| /^#{PREFIX}:(nameCorporate-?\d*):namePart-\d+$/.match(h) }.compact
+        puts corp_multi_part.to_s
+        to_delete = []
+        corp_multi_part.each do |corp|
+          column_name_prefix = "#{PREFIX}:nameCorporate-#{total_corporate_names}"
+
+          role_match = csv.headers.map { |h| /^#{PREFIX}:#{corp[1]}:(role-?\d*)$/.match(h) }.compact
+
+          # Create empty columns
+          (0...role_match.count).each do |i|
+            if i.zero?
+              csv.add_column("#{column_name_prefix}:role")
+            else
+              csv.add_column("#{column_name_prefix}:role-#{i}")
+            end
+          end
+          csv.add_column("#{column_name_prefix}:namePart")
+
+          csv.table.each do |row|
+            next if row[corp.string].blank?
+            row["#{column_name_prefix}:namePart"] = row[corp.string]
+            role_match.each do |role|
+              row["#{column_name_prefix}:#{role[1]}"] = row[role.string]
+            end
+          end
+
+          total_corporate_names += 1
+        end
+        to_delete = csv.empty_columns.grep(/^#{PREFIX}:nameCorporate-?\d*:role-?\d*$/) + corp_multi_part.map(&:string)
+        csv.delete_columns(to_delete, with_prefix: true)
+
         # Map personal names
         name_matches = csv.headers.map { |h| /^#{PREFIX}:(namePersonal-?(\d*)):namePartFamily$/.match(h) }.compact
         name_matches.each do |name|
@@ -71,7 +108,7 @@ module HyacinthMapping::TemplateMapping
           end
 
           # Rename rest of columns
-          csv.rename_column("#{PREFIX}:#{name[1]}:nameID", "name-#{num}:name_uni.value")
+          csv.rename_column("#{PREFIX}:#{name[1]}:nameID", "name-#{num}:name_term.uni")
           csv.rename_column(name.string, "name-#{num}:name_term.value")
 
           csv.add_name_type(num: num, type: 'personal')
@@ -147,7 +184,7 @@ module HyacinthMapping::TemplateMapping
         # Delete blank columns that start with the template prefix.
         # These are columns we don't need to bother mapping anyways.
         blank_columns = empty_columns.grep(/^#{PREFIX}:.+$/)
-        puts "Empty columns to be removed: \n#{blank_columns.join("\n")}\n\n"
+        puts "Empty columns to be removed: \n#{blank_columns.join("\n")}\n\n" unless blank_columns.empty?
         csv.delete_columns(blank_columns, with_prefix: true)
 
         csv.export_to_file

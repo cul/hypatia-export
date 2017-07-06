@@ -6,13 +6,20 @@ namespace :hyacinth do
   task :create_csv_for => :environment do
     if ENV['item_type_code']
       code = ENV['item_type_code']
-      filename = ENV['filename'] || "#{code}-export-from-hypatia.csv"
+      filename = ENV['filename']
+      num = nil
+      num = ENV['num'] unless ENV['num'].blank?
       # Raise error if filename does not contain 'export-from-hypatia'
     else
-      puts "pass item_type_code=code [filename=filename]"
+      puts "pass item_type_code=code [filename=filename num=num]"
     end
 
-    gdrive_export = File.expand_path(File.join('~', 'Google Drive', 'AC4', 'Hypatia to Hyacinth Migration', 'Export CSVs', code, filename))
+    folder = (num.blank?) ? "#{code}" : "#{code}-#{num}"
+    filename = "#{folder}-export-from-hypatia.csv" if filename.blank?
+
+    puts Rainbow("#{folder}/#{filename}").cyan
+
+    gdrive_export = File.expand_path(File.join('~', 'Google Drive', 'AC4', 'Hypatia to Hyacinth Migration', 'Export CSVs', folder, filename))
     mapped_file = File.join(Rails.root, 'tmp', 'data', filename.gsub('export-from-hypatia', 'hyacinth-import-for-review'))
 
     HyacinthMapping.send("from_#{code.downcase}", gdrive_export, mapped_file)
@@ -20,20 +27,32 @@ namespace :hyacinth do
 
   task :create_many_csvs => :environment do
     (1..19).each do |num|
-      filename = "acSerialPart-#{num}-export-from-hypatia.csv"
       ENV['item_type_code'] = 'acSerialPart'
-      ENV['filename'] = filename
-      puts Rainbow(filename).cyan
+      ENV['num'] = num.to_s
       Rake::Task['hyacinth:create_csv_for'].execute
     end
 
-    (1..12).each do |num|
-      filename = "acMonograph-#{num}-export-from-hypatia.csv"
-      ENV['item_type_code'] = 'acMonograph'
-      ENV['filename'] = filename
-      puts Rainbow(filename).cyan
-      Rake::Task['hyacinth:create_csv_for'].execute
-    end
+    # (1..12).each do |num|
+    #   ENV['item_type_code'] = 'acMonograph'
+    #   ENV['num'] = num.to_s
+    #   Rake::Task['hyacinth:create_csv_for'].execute
+    # end
+
+    # (1..9).each do |num|
+    #   ENV['item_type_code'] = "acETD"
+    #   ENV['num'] = num.to_s
+    #   Rake::Task['hyacinth:create_csv_for'].execute
+    # end
+
+    # (1..2).each do |num|
+    #   ENV['item_type_code'] = "acMonographPart"
+    #   ENV['num'] = num.to_s
+    #   Rake::Task['hyacinth:create_csv_for'].execute
+    # end
+    #
+    # ENV['num'] = nil
+    # ENV['item_type_code'] = "acWebpagePart"
+    # Rake::Task['hyacinth:create_csv_for'].execute
   end
 
   task :decode_html_entities do
@@ -64,11 +83,11 @@ namespace :hyacinth do
   end
 
   task :publish_csv => :environment do
-    if ENV['template'] && ENV['files']
-      template = ENV['template']
+    if ENV['folder'] && ENV['files']
+      folder = ENV['folder']
       files = ENV['files']
     else
-      puts Rainbow("pass template=TEMPLATE_CODE files=FILENAME1,FILENAME2").red
+      puts Rainbow("pass folder=FOLDER_NAME files=FILENAME1,FILENAME2").red
     end
 
     GOOGLE_DRIVE_FOLDER = File.expand_path(File.join('~', 'Google Drive', 'AC4', 'Hypatia to Hyacinth Migration', 'Export CSVs'))
@@ -77,7 +96,7 @@ namespace :hyacinth do
     do_not_publish = CSV.read(DO_NOT_PUBLISH, headers: true ).map { |r| r['_pid'] }
 
     pids = files.split(',').map do |file|
-      filename = File.join(GOOGLE_DRIVE_FOLDER, template, file)
+      filename = File.join(GOOGLE_DRIVE_FOLDER, folder, file)
       CSV.read(filename, headers: true).map { |r| r['_pid'] }.compact
     end.flatten
 
@@ -91,8 +110,8 @@ namespace :hyacinth do
       end
     end
 
-    # Write out CSV to google_drive_folder/template/PUBLISH-template.csv
-    filename = File.join(GOOGLE_DRIVE_FOLDER, template, "PUBLISH-#{template}.csv")
+    # Write out CSV to google_drive_folder/folder_name/PUBLISH-folder_name.csv
+    filename = File.join(GOOGLE_DRIVE_FOLDER, folder, "PUBLISH-#{folder}.csv")
     CSV.open(filename, 'w', encoding: 'UTF-8') do |csv|
       csv.add_row ['_pid', '_publish_targets-1.string_key', '_publish']
       pids.each { |pid| csv.add_row([pid, 'academic_commons', 'TRUE']) }
@@ -137,7 +156,7 @@ namespace :hyacinth do
       end
     end
 
-    asset_csv = aggregator_csv.sub('hyacinth-import', 'asset-to-aggregators')
+    asset_csv = aggregator_csv.sub('hyacinth-import-for-review', 'asset-to-aggregators')
 
     # Create aggregator to asset csv.
     CSV.open(asset_csv, "w") do |csv|

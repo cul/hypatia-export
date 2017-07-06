@@ -64,7 +64,7 @@ module HyacinthMapping::TemplateMapping
           end
 
           # Rename rest of columns
-          csv.rename_column("#{PREFIX}:#{name[1]}:nameID", "name-#{num}:name_uni.value")
+          csv.rename_column("#{PREFIX}:#{name[1]}:nameID", "name-#{num}:name_term.uni")
           csv.rename_column(name.string, "name-#{num}:name_term.value")
 
           csv.add_name_type(num: num, type: 'personal')
@@ -86,7 +86,6 @@ module HyacinthMapping::TemplateMapping
             csv.map_values_to_uri(new_column, HyacinthMapping::UriMapping::ROLES_MAP)
           end
 
-          # csv.merge_columns("#{name[1]}:namePart-1", "#{name[1]:namePart}")
           csv.rename_column(name.string, "name-#{num}:name_term.value")
           csv.add_name_type(num: num, type: 'corporate')
         end

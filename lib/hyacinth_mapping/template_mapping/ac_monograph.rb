@@ -25,8 +25,12 @@ module HyacinthMapping::TemplateMapping
         'relatedItemSeries:seriesID'                  => 'series-1:series_is_columbia',
         'relatedItemSeries:identifierISSN'            => 'series-1:series_issn',
         'identifierDOI'                               => 'parent_publication-1:parent_publication_doi',
-        'relateditemOtherVersion:relatedItemHost:identifierISBN' => 'parent_publication-1:parent_publication_isbn',
-        'relateditemOtherVersion:relatedItemHost:originInfoDateIssued' => 'parent_publication-1:parent_publication_date_created_textual'
+        'relatedItemLink:locationURL'                 => 'object_in_context_url-1:object_in_context_url_value',
+        'relateditemOtherVersion:relatedItemHost:identifierISBN'       => 'parent_publication-1:parent_publication_isbn',
+        'relateditemOtherVersion:relatedItemHost:originInfoDateIssued' => 'parent_publication-1:parent_publication_date_created_textual',
+        'relateditemOtherVersion:relatedItemHost:originInfoPlace'      => 'parent_publication-1:parent_publication_place_of_origin',
+        'relateditemOtherVersion:relatedItemHost:originInfoPublisher'  => 'parent_publication-1:parent_publication_publisher',
+        'relateditemOtherVersion:relatedItemHost:identifierURI'        => 'parent_publication-1:parent_publication_uri'
       }
 
       def from_acmonograph(export_filepath, import_filepath)
@@ -35,6 +39,11 @@ module HyacinthMapping::TemplateMapping
         csv.delete_columns(%w{
           tableOfContents RIOXX:Funder RIOXX:Grant attachment attachment-1
           physicalDescription:extent physicalDescription:internetMediaType
+          relatedItemSeries:identifierCUAffiliate copyright:creativeCommonsLicense
+          RIOXX-1:Funder RIOXX-2:Funder relateditemOtherVersion:namePersonal:role
+          relateditemOtherVersion:relatedItemHost:namePersonal:namePartFamily
+          relateditemOtherVersion:relatedItemHost:namePersonal:namePartGiven
+          relateditemOtherVersion:relatedItemHost:namePersonal:role
         })
 
         # Merge note columns.
@@ -56,7 +65,7 @@ module HyacinthMapping::TemplateMapping
           end
 
           # Rename rest of columns
-          csv.rename_column("#{PREFIX}:#{name[1]}:nameID", "name-#{num}:name_uni.value")
+          csv.rename_column("#{PREFIX}:#{name[1]}:nameID", "name-#{num}:name_term.uni")
           csv.rename_column(name.string, "name-#{num}:name_term.value")
 
           csv.add_name_type(num: num, type: 'personal')
@@ -69,6 +78,8 @@ module HyacinthMapping::TemplateMapping
         # Map corporate names
         corporate_matches = csv.headers.map { |h| /^#{PREFIX}:(nameCorporate-?(\d*)):namePart$/.match(h) }.compact
         corporate_matches.each do |name|
+          csv.merge_columns("#{name[1]}:namePart-1", "#{name[1]}:namePart") if csv.headers.include?("#{PREFIX}:#{name[1]}:namePart-1")
+
           num = name_matches.count + name[2].to_i + 1
 
           role_match = csv.headers.map { |h| /^#{PREFIX}:#{name[1]}:role-?(\d*)$/.match(h) }.compact

@@ -61,7 +61,7 @@ module HyacinthMapping
           end
 
           # Rename rest of columns
-          csv.rename_column("#{PREFIX}:#{name[1]}:nameID", "name-#{num}:name_uni.value")
+          csv.rename_column("#{PREFIX}:#{name[1]}:nameID", "name-#{num}:name_term.uni")
           csv.rename_column(name.string, "name-#{num}:name_term.value")
 
           csv.add_name_type(num: num, type: 'personal')
